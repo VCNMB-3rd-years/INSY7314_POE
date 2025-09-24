@@ -8,7 +8,7 @@ export default function VerifySwift() {
 
     return(
         <div>
-            <h1>Create Transaction</h1>
+            <h1>Create A Transaction</h1>
             <button onClick={backToDash}>Back to Dashboard</button>
         </div>
     )
