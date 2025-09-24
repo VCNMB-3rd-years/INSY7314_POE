@@ -1,19 +1,37 @@
-import { Navigate, useNavigate } from  "react-router-dom"
+import { useNavigate } from "react-router-dom";
+import BankNavbar from "../../components/BankNavbar";
 
-export default function VerifySwift() {
-    const navigate = useNavigate()
-    //this will allow a emp to proceed with verifying a swift code
-    const handleTransactions = () => {
-        navigate("/verifyTransaction")
-    }
-    const backToDash = () => {
-        navigate("/empDashboard")
-    }
+export default function VerifyTransaction() {
+  const navigate = useNavigate();
 
-    return(
-        <div>
-            <h1>Verify Transaction</h1>
-            <button onClick={backToDash}>Back to Dashboard</button>
-        </div>
-    )
+  const backToDash = () => {
+    navigate("/empDashboard");
+  };
+
+  return (
+    <>
+      <BankNavbar userType="employee" />
+      <div className="page-container" style={{ padding: "2rem" }}>
+        <h1>Verify Transaction</h1>
+        <p>
+          Enter the SWIFT code or transaction details below to verify its
+          authenticity.
+        </p>
+        <form
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            maxWidth: "350px",
+            gap: "1rem",
+          }}
+        >
+          <input type="text" placeholder="SWIFT Code" required />
+          <button type="submit">Verify</button>
+        </form>
+        <button style={{ marginTop: "2rem" }} onClick={backToDash}>
+          Back to Dashboard
+        </button>
+      </div>
+    </>
+  );
 }

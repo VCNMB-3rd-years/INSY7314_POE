@@ -1,25 +1,34 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./BankNavbar.css";
 
 const BankNavbar = ({ userType = "guest" }) => {
+  const navigate = useNavigate();
+
   return (
     <nav className="bank-navbar">
       <div className="navbar-logo">
-        <img src="/vite.svg" alt="BankLinQ Logo" />
-        <span>BankLinQ</span>
+        <Link to="/" className="navbar-logo-link">
+          <img src="/coinnect.png" alt="Coinnect Logo" />
+          <span>Coinnect</span>
+        </Link>
       </div>
       <ul className="navbar-links">
-        <li>
-          <Link to="/">Home</Link>
-        </li>
         {userType === "guest" && (
           <>
             <li>
-              <Link to="/login">Login</Link>
+              <Link to="/login">About</Link>
             </li>
             <li>
-              <Link to="/register">Register</Link>
+              <Link to="/login">Contact</Link>
+            </li>
+            <li>
+              <button
+                className="navbar-signup-btn"
+                onClick={() => navigate("/register")}
+              >
+                Sign Up / Login
+              </button>
             </li>
           </>
         )}
