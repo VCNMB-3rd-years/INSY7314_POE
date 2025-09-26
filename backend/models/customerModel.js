@@ -13,12 +13,12 @@ const AccountSchema = new mongoose.Schema({
 });
 
 const CustomerSchema = new mongoose.Schema({
-  nationalId: String,
-  firstName: String,
-  lastName: String,
-  username: String,
-  password: String,
-  accounts: [AccountSchema]
+   nationalId: { type: String, required: true, unique: true },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  accounts: [AccountSchema],
 });
 
 module.exports = mongoose.model("customerModel", CustomerSchema);
