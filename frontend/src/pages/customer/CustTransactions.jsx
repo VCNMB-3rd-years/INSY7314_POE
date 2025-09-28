@@ -1,19 +1,28 @@
-import { Navigate, useNavigate } from  "react-router-dom"
+import { useNavigate } from "react-router-dom";
+import BankNavbar from "../../components/BankNavbar";
 
-export default function Transactions() {
-    const navigate = useNavigate()
-    //this will allow a customer to view all their transactions by cust id
-    const handleTransaction = () => {
-        navigate("/viewTransactions")
-    }
-    const backToDash = () => {
-        navigate("/custDashboard")
-    }
+export default function CustTransactions() {
+  const navigate = useNavigate();
 
-    return(
-        <div>
-            <h1>View My Transactions</h1>
-            <button onClick={backToDash}>Back to Dashboard</button>
-        </div>
-    )
+  // This will allow a customer to view all their transactions by cust id
+  const backToDash = () => {
+    navigate("/custDashboard");
+  };
+
+  return (
+    <>
+      <BankNavbar userType="customer" />
+      <div className="page-container" style={{ padding: "2rem" }}>
+        <h1>My Transactions</h1>
+        <p>
+          Here you can view all your past transactions. For more details, select
+          a transaction below.
+        </p>
+        {/* Transaction list would go here */}
+        <button style={{ marginTop: "2rem" }} onClick={backToDash}>
+          Back to Dashboard
+        </button>
+      </div>
+    </>
+  );
 }
