@@ -1,87 +1,69 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { Paper } from "@mui/material";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import BankNavbar from "../../components/BankNavbar";
-import "../../App.css";
 
 const Login = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
+  // Temporary users for testing
+  const mockUsers = [
+    { username: "customer1", password: "1234", type: "customer" },
+    { username: "employee1", password: "1234", type: "employee" },
+  ];
 
-    if (!username || !password) {
-      setError("Username and password are required");
+  const handleLogin = (e) => {
+    e.preventDefault();
+
+    // Replace this with real backend call later
+    const user = mockUsers.find(
+      (u) => u.username === username && u.password === password
+    );
+
+    if (!user) {
+      setError("Invalid username or password");
       return;
     }
 
-    try {
-      const response = await axios.post("http://localhost:3000/login", {
-        username,
-        password,
-      });
-
-      const customer = response.data.customer;
-      if (!customer) {
-        setError("Login failed");
-        return;
-      }
-
-      localStorage.setItem("customer", JSON.stringify(customer));
-      navigate("/customer/dashboard");
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || "Server not reachable");
-    }
+    // Redirect based on user type
+    if (user.type === "customer") navigate("/customer/dashboard");
+    else if (user.type === "employee") navigate("/employee/dashboard");
   };
 
   return (
     <>
       <BankNavbar userType="guest" />
-      <div className="auth-container">
-         <Paper elevation={20} className="auth-card">
-          <h2 className="auth-title">Login</h2>
-          <form onSubmit={handleLogin} className="auth-form">
-            <div className="input-group">
-              <input
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-            </div>
-            <div className="input-group">
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <span
-                className="eye-icon"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-              </span>
-            </div>
-            {error && <p className="error-text">{error}</p>}
-            <button type="submit" className="auth-button">
-              Login
-            </button>
-            
-          </form>
-          </Paper>
-        </div>
-      
+      <div className="page-container" style={{ padding: "2rem" }}>
+        <h1>Login</h1>
+        <form
+          onSubmit={handleLogin}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            maxWidth: "300px",
+            gap: "1rem",
+          }}
+        >
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          {error && <p style={{ color: "red" }}>{error}</p>}
+          <button type="submit">Login</button>
+        </form>
+      </div>
     </>
   );
 };

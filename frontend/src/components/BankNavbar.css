@@ -1,8 +1,4 @@
 .bank-navbar {
-  position: sticky;
-  top: 0;
-  left: 0;
-  right: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -10,8 +6,10 @@
   background: linear-gradient(90deg, #3a8dde 0%, #6dd5ed 100%);
   color: #fff;
   box-shadow: 0 2px 8px rgba(58, 141, 222, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
-
 
 .navbar-logo {
   display: flex;
