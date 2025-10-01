@@ -1,7 +1,3 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import BankNavbar from "../../components/BankNavbar";
-
 const Login = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");

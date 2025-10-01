@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Landing from "./pages/Landing";
+=======
+import Landing from "./pages/Landing.jsx";
+>>>>>>> Stashed changes
 
 import Login from "./pages/account/Login.jsx";
 import Register from "./pages/account/Register.jsx";
