@@ -1,7 +1,7 @@
-.register-flex-wrapper {
+.login-flex-wrapper {
   display: flex;
   justify-content: center;
-  align-items: stretch; /* ensures both containers are equal height */
+  align-items: stretch;
   min-height: 90vh;
   max-width: 900px;
   margin: 3rem auto;
@@ -10,8 +10,8 @@
   background: transparent;
 }
 
-.register-image-container,
-.register-form-container {
+.login-image-container,
+.login-form-container {
   flex: 1;
   min-height: 50vh;
   border-radius: 32px;
@@ -23,11 +23,7 @@
   overflow: hidden;
 }
 
-.register-image-container {
-  border-radius: 32px;
-}
-
-.register-image-container img {
+.login-image-container img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -35,14 +31,14 @@
   display: block;
 }
 
-.register-form-container {
+.login-form-container {
   background: #fff;
   border-radius: 32px;
   padding: 3rem 2rem;
   flex-direction: column;
 }
 
-.register-form-container h1 {
+.login-form-container h1 {
   margin-bottom: 1rem;
   color: #222;
   font-size: 2rem;
@@ -50,7 +46,7 @@
   text-align: center;
 }
 
-.register-form {
+.login-form {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
@@ -59,7 +55,7 @@
   margin: 0 auto;
 }
 
-.register-form input {
+.login-form input {
   padding: 0.8rem 1rem;
   border: 1px solid #cbe5fa;
   border-radius: 8px;
@@ -69,12 +65,12 @@
   transition: border 0.2s;
 }
 
-.register-form input:focus {
+.login-form input:focus {
   border: 1.5px solid #3a8dde;
   outline: none;
 }
 
-.register-form button {
+.login-form button {
   padding: 0.8rem 1rem;
   background: linear-gradient(90deg, #ff9900 0%, #ffb347 100%);
   color: #fff;
@@ -87,11 +83,11 @@
   box-shadow: 0 2px 8px rgba(255, 153, 0, 0.12);
 }
 
-.register-form button:hover {
+.login-form button:hover {
   background: linear-gradient(90deg, #ffb347 0%, #ff9900 100%);
 }
 
-.register-form p {
+.login-form p {
   margin: 0;
   color: #e74c3c;
   font-size: 0.95rem;
@@ -99,19 +95,19 @@
 }
 
 @media (max-width: 900px) {
-  .register-flex-wrapper {
+  .login-flex-wrapper {
     flex-direction: column;
     max-width: 95vw;
     border-radius: 32px;
   }
-  .register-image-container,
-  .register-form-container {
+  .login-image-container,
+  .login-form-container {
     border-radius: 32px;
     min-height: 250px;
     max-width: 100%;
     padding: 2rem 1rem;
   }
-  .register-image-container img {
+  .login-image-container img {
     border-radius: 32px;
     width: 100%;
     height: 200px;

@@ -4,14 +4,28 @@ import "./Register.css";
 
 const Register = () => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [idNumber, setIdNumber] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   // Temporary users for testing
   const mockUsers = [
-    { username: "customer1", password: "1234", type: "customer" },
-    { username: "employee1", password: "1234", type: "employee" },
+    {
+      fullName: "John Doe",
+      idNumber: "1234567890",
+      accountNumber: "10001",
+      password: "1234",
+      type: "customer",
+    },
+    {
+      fullName: "Jane Smith",
+      idNumber: "9876543210",
+      accountNumber: "20001",
+      password: "1234",
+      type: "employee",
+    },
   ];
 
   const handleRegister = (e) => {
@@ -19,11 +33,15 @@ const Register = () => {
 
     // Replace this with real backend call later
     const user = mockUsers.find(
-      (u) => u.username === username && u.password === password
+      (u) =>
+        u.fullName === fullName &&
+        u.idNumber === idNumber &&
+        u.accountNumber === accountNumber &&
+        u.password === password
     );
 
     if (!user) {
-      setError("Invalid username or password");
+      setError("Invalid registration details");
       return;
     }
 
@@ -42,9 +60,23 @@ const Register = () => {
         <form className="register-form" onSubmit={handleRegister}>
           <input
             type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Full Name"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder="ID Number"
+            value={idNumber}
+            onChange={(e) => setIdNumber(e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Account Number"
+            value={accountNumber}
+            onChange={(e) => setAccountNumber(e.target.value)}
             required
           />
           <input
