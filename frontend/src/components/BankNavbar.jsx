@@ -2,11 +2,15 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./BankNavbar.css";
 
-const BankNavbar = ({ userType = "guest" }) => {
+const BankNavbar = ({ userType = "guest", variant = "dark" }) => {
   const navigate = useNavigate();
 
   return (
-    <nav className="bank-navbar">
+    <nav
+      className={`bank-navbar ${
+        variant === "gradient" ? "navbar-gradient" : ""
+      }`}
+    >
       <div className="navbar-logo">
         <Link to="/" className="navbar-logo-link">
           <img src="/coinnect.png" alt="Coinnect Logo" />
@@ -17,10 +21,10 @@ const BankNavbar = ({ userType = "guest" }) => {
         {userType === "guest" && (
           <>
             <li>
-              <Link to="/login">About</Link>
+              <a href="#about">About</a>
             </li>
             <li>
-              <Link to="/login">Contact</Link>
+              <a href="#contact">Contact</a>
             </li>
             <li>
               <button

@@ -3,26 +3,126 @@ import AppSidebar from "../../components/AppSidebar";
 
 export default function CustTransactions() {
   const navigate = useNavigate();
-
-  // This will allow a customer to view all their transactions by cust id
   const backToDash = () => {
     navigate("/custDashboard");
   };
 
+  // Placeholder transaction data
+  const transactions = [
+    { id: 1, recipient: "12345678", amount: "R500", reference: "Groceries" },
+    { id: 2, recipient: "87654321", amount: "R1200", reference: "Rent" },
+  ];
+
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#242424" }}>
+    <div
+      style={{
+        display: "flex",
+        minHeight: "100vh",
+        background: "#1a1a1a",
+        fontFamily: "Inter, sans-serif",
+      }}
+    >
       <AppSidebar userType="customer" />
-      <div style={{ flex: 1, padding: "3rem 2rem", color: "#fff" }}>
-        <h1>My Transactions</h1>
-        <p>
-          Here you can view all your past transactions. For more details, select
-          a transaction below.
-        </p>
-        {/* Transaction list would go here */}
-        <button style={{ marginTop: "2rem" }} onClick={backToDash}>
-          Back to Dashboard
-        </button>
+      <div
+        style={{
+          flex: 1,
+          padding: "3rem 2rem",
+          color: "#fff",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "flex-start",
+        }}
+      >
+        <div
+          style={{
+            background: "#2a2a2a",
+            padding: "2rem",
+            borderRadius: "1rem",
+            boxShadow: "0 8px 20px rgba(0,0,0,0.3)",
+            width: "100%",
+            maxWidth: "700px",
+          }}
+        >
+          <h1 style={{ fontSize: "1.8rem", marginBottom: "0.5rem" }}>
+            📜 My Transactions
+          </h1>
+          <p
+            style={{ color: "#bbb", marginBottom: "2rem", fontSize: "0.95rem" }}
+          >
+            Here you can view all your past transactions.
+          </p>
+
+          {/* Transaction list */}
+          {transactions.length > 0 ? (
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                marginBottom: "1.5rem",
+              }}
+            >
+              <thead>
+                <tr style={{ textAlign: "left", color: "#bbb" }}>
+                  <th style={tableHeader}>Recipient</th>
+                  <th style={tableHeader}>Amount</th>
+                  <th style={tableHeader}>Reference</th>
+                </tr>
+              </thead>
+              <tbody>
+                {transactions.map((t) => (
+                  <tr
+                    key={t.id}
+                    style={{
+                      borderBottom: "1px solid #444",
+                    }}
+                  >
+                    <td style={tableCell}>{t.recipient}</td>
+                    <td style={tableCell}>{t.amount}</td>
+                    <td style={tableCell}>{t.reference}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p style={{ color: "#888" }}>No transactions yet. 💡</p>
+          )}
+
+          <button
+            style={{
+              ...buttonSecondaryStyle,
+              width: "100%",
+            }}
+            onClick={backToDash}
+          >
+            ⬅ Back to Dashboard
+          </button>
+        </div>
       </div>
     </div>
   );
 }
+
+const tableHeader = {
+  padding: "0.75rem 1rem",
+  borderBottom: "1px solid #444",
+  fontWeight: "600",
+  fontSize: "0.95rem",
+};
+
+const tableCell = {
+  padding: "0.75rem 1rem",
+  fontSize: "0.95rem",
+  color: "#eee",
+};
+
+const buttonSecondaryStyle = {
+  padding: "0.9rem 1rem",
+  borderRadius: "0.6rem",
+  border: "1px solid #666",
+  background: "transparent",
+  color: "#bbb",
+  fontSize: "1rem",
+  fontWeight: "500",
+  cursor: "pointer",
+  transition: "background 0.3s, transform 0.2s",
+};

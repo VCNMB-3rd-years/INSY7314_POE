@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   Home,
   PlusCircle,
@@ -8,11 +8,18 @@ import {
   X,
   ShieldCheck,
   FolderOpen,
+  LogOut,
 } from "lucide-react";
 import "./AppSidebar.css";
 
 export default function AppSidebar({ userType = "customer" }) {
   const [collapsed, setCollapsed] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // optional: clear auth/session storage here
+    navigate("/"); // go back to landing page
+  };
 
   return (
     <nav className={`app-sidenav ${collapsed ? "collapsed" : ""}`}>
@@ -92,6 +99,12 @@ export default function AppSidebar({ userType = "customer" }) {
           </>
         )}
       </div>
+
+      {/* Logout Button */}
+      <button className="app-logout-btn" onClick={handleLogout}>
+        <LogOut size={20} />
+        {!collapsed && <span>Logout</span>}
+      </button>
 
       {/* Collapse Button */}
       <button

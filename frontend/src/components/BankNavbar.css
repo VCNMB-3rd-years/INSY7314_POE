@@ -3,11 +3,20 @@
   align-items: center;
   justify-content: space-between;
   padding: 2rem 4rem;
-  background: #242424;
+  background: #242424; /* default dark */
   color: #fff;
   position: sticky;
   top: 0;
   z-index: 100;
+}
+
+.navbar-gradient {
+  background: linear-gradient(
+    135deg,
+    #0f2027,
+    #203a43,
+    #2c5364
+  ); /* matches hero */
 }
 
 .navbar-logo {
@@ -62,7 +71,7 @@
 }
 
 .navbar-signup-btn {
-  background: #222;
+  background: #3a8dde;
   color: #fff;
   border: none;
   padding: 0.5rem 1rem;
@@ -72,14 +81,12 @@
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
   vertical-align: middle;
-  /* Remove default button outline for better look */
   outline: none;
-  /* Match link height and alignment */
   display: inline-block;
 }
 
 .navbar-signup-btn:hover {
-  background: #ff9900;
+  background: #6dd5ed;
   color: #fff;
 }
 
