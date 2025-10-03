@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import AppSidebar from "../../components/AppSidebar";
 import BankNavbar from "../../components/BankNavbar";
 
 export default function VerifyTransaction() {
@@ -9,9 +10,9 @@ export default function VerifyTransaction() {
   };
 
   return (
-    <>
-      <BankNavbar userType="employee" />
-      <div className="page-container" style={{ padding: "2rem" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#242424" }}>
+      <AppSidebar userType="employee" />
+      <div style={{ flex: 1, padding: "3rem 2rem", color: "#fff" }}>
         <h1>Verify Transaction</h1>
         <p>
           Enter the SWIFT code or transaction details below to verify its
@@ -32,6 +33,6 @@ export default function VerifyTransaction() {
           Back to Dashboard
         </button>
       </div>
-    </>
+    </div>
   );
 }

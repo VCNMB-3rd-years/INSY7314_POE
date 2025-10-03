@@ -1,30 +1,22 @@
 import { useNavigate } from "react-router-dom";
-import BankNavbar from "../../components/BankNavbar";
+import AppSidebar from "../../components/AppSidebar";
 
 export default function CustDashboard() {
   const navigate = useNavigate();
-
-  const createTransaction = () => {
-    navigate("/createTransaction");
-  };
-  const viewCustTransactions = () => {
-    navigate("/custTransactions");
+  const backToDash = () => {
+    navigate("/custDashboard");
   };
 
   return (
-    <>
-      <BankNavbar userType="customer" />
-      <div className="page-container" style={{ padding: "2rem" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#242424" }}>
+      <AppSidebar userType="customer" />
+      <div style={{ flex: 1, padding: "3rem 2rem", color: "#fff" }}>
         <h1>Customer Dashboard</h1>
         <p>
           Welcome to your dashboard! Here you can create new transactions and
           view your transaction history.
         </p>
-        <div style={{ display: "flex", gap: "1rem", marginTop: "2rem" }}>
-          <button onClick={createTransaction}>Create Transaction</button>
-          <button onClick={viewCustTransactions}>View My Transactions</button>
-        </div>
       </div>
-    </>
+    </div>
   );
 }

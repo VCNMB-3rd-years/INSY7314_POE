@@ -1,4 +1,5 @@
 import BankNavbar from "../../components/BankNavbar";
+import AppSidebar from "../../components/AppSidebar";
 import { useNavigate } from "react-router-dom";
 
 export default function AllTransactions() {
@@ -37,10 +38,22 @@ export default function AllTransactions() {
   ];
 
   return (
-    <>
-      <BankNavbar userType="employee" />
-      <div className="page-container" style={{ padding: "2rem" }}>
-        <h1>View All Transactions</h1>
+    <div
+      style={{
+        display: "flex",
+        minHeight: "100vh",
+        background: "#213547",
+      }}
+    >
+      <AppSidebar userType="employee" />
+      <div
+        style={{
+          flex: 1,
+          padding: "3rem 2rem",
+          color: "#fff",
+        }}
+      >
+        <h1>All Transactions</h1>
         <p>
           Here you can view all transactions processed by the system. Select a
           transaction for more details or verify a SWIFT code.
@@ -78,6 +91,6 @@ export default function AllTransactions() {
           <button onClick={verifySwiftCode}>Verify Transaction</button>
         </div>
       </div>
-    </>
+    </div>
   );
 }
