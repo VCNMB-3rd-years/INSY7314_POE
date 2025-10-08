@@ -24,7 +24,7 @@ const updateCustomer = async (req, res) => {
       { nationalId, firstName, lastName, username, password },
       { new: true }
     );
-    // spit it out encoded in json
+   
     res.status(202).json(customer);
   } catch (error) {
     // if things go south, spit out the error message
@@ -32,4 +32,43 @@ const updateCustomer = async (req, res) => {
   }
 };
 
-module.exports = {updateCustomer};
+// GET: all customers
+const getCustomers = async (req, res) => {
+  try {
+    const customers = await Customer.find({});
+    // return the customers
+    res.status(200).json(customers);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// GET: get a singluar customers by id
+const getCustomer = async (req, res) => {
+  // get the id of the customers that the user is looking for, from the parameters
+  const id = req.params.id;
+
+  // null check
+  if (!id) {
+    res.status(400).json({ message: "Please provide an ID to search for!" });
+  }
+
+  try {
+    // try find the customers using the provided ID
+    const customers = await Customer.findById(id);
+
+    // if no customers is found matching the provided ID, we should return 404 with an informative message
+    if (!customers) {
+      res.status(404).json({ message: "No customers found that matches that ID." });
+    }
+
+    // otherwise, return the customers
+    res.status(200).json(customers);
+  } catch (error) {
+    // throw a server error if an issue occurs
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+module.exports = {updateCustomer, getCustomers, getCustomer};
