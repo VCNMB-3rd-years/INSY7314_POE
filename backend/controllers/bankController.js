@@ -1,12 +1,14 @@
 // controllers/bankController.js
-const Bank = require("../models/bankModel");
+const Bank = require('../models/bankModel');
 
-// GET: getBank
-exports.getBank = async (req, res) => {
+// GET: all banks
+const getBanks = async (req, res) => {
   try {
-    const banks = await Bank.find();
-    res.json(banks);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    // create a new variable to hold the result of our query
+    const banks = await Bank.find({});
+    // return the banks
+    res.status(200).json(banks);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
