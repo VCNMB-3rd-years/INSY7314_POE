@@ -16,10 +16,8 @@ const updateCustomer = async (req, res) => {
     if (!customer) {
       res.status(404).json({ message: "No customer found that matches that ID." });
     }
-
-    // otherwise, we then update the updated fields
-    // finally, ensure that the new version (post update) is returned, rather than the old customer
-    customer = await Customer.findByIdAndUpdate(
+    
+    const updatedCustomer = await Customer.findByIdAndUpdate(
       id,
       { nationalId, firstName, lastName, username, password },
       { new: true }
@@ -70,5 +68,31 @@ const getCustomer = async (req, res) => {
   }
 };
 
+// DELETE: remove a customer
+const deleteCustomer = async (req, res) => {
+  // get the id of the customer we want to remove
+  const id = req.params.id;
 
-module.exports = {updateCustomer, getCustomers, getCustomer};
+  // null check
+  if (!id) {
+    res.status(400).json({ message: "Please provide an ID to delete." });
+  }
+
+  // first try find the customer
+  try {
+    var customer = await Customer.findById(id);
+
+    // if no customer, 404 and exit the method
+    if (!customer) {
+      res.status(404).json({ message: "No customer found that matches that ID." });
+    }
+
+    // find the customer, delete it, and return what it was
+    customer = await Customer.findByIdAndDelete(id);
+    res.status(202).json(customer);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = {updateCustomer, getCustomers, getCustomer, deleteCustomer};

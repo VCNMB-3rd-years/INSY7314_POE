@@ -1,7 +1,7 @@
 const Customer = require("../models/customerModel.js");
 const Employee = require("../models/employeeModel.js");
 
-// Register endpoint
+// POST: Register endpoint
 const register = async (req, res) => {
   const { userType, username, password, ...rest } = req.body;
 
@@ -18,7 +18,7 @@ const register = async (req, res) => {
   }
 };
 
-// Login endpoint
+// POST: Login endpoint
 const login = async (req, res) => {
   const { userType, username, password } = req.body;
 
@@ -36,7 +36,7 @@ const login = async (req, res) => {
   }
 };
 
-// Logout endpoint
+// GET:Logout endpoint
 const logout = async (req, res) => {
   res.status(200).json({ message: "Logged out successfully." });
 };
