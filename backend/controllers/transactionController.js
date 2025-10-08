@@ -1,5 +1,5 @@
 // controllers/transactionController.js
-const Transaction = require("../controllers/transactionModel");
+const Transaction = require("../controllers/transactionModel.js");
 
 // GET: all transaction
 const getTransactions = async (req, res) => {

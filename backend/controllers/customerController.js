@@ -1,5 +1,5 @@
 // controllers/customerController.js
-const Customer = require("../models/customerModel");
+const Customer = require("../models/customerModel.js");
 
 // PUT: update an existing customer
 const updateCustomer = async (req, res) => {

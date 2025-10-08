@@ -1,5 +1,5 @@
 // controllers/bankController.js
-const Bank = require('../models/bankModel');
+const Bank = require('../models/bankModel.js');
 
 // GET: all banks
 const getBanks = async (req, res) => {
