@@ -1,0 +1,124 @@
+/* Sidebar container */
+.app-sidenav {
+  position: relative;
+  width: 240px;
+  background: #1e1e1e;
+  border-right: 1px solid #2c2c2c;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1rem;
+  transition: width 0.25s ease;
+  min-height: 100vh;
+}
+
+.app-sidenav.collapsed {
+  width: 70px;
+}
+
+/* Logo */
+.app-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 2rem;
+}
+
+.app-logo img {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.app-brand {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #e6f0ff;
+  letter-spacing: 0.5px;
+}
+
+/* Links */
+.app-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: auto; /* pushes logout to bottom */
+}
+
+.app-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  color: #cbd5e1;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
+}
+
+.app-link:hover {
+  background: #2d3748;
+  color: #fff;
+  transform: translateX(3px);
+}
+
+.app-link.active {
+  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Collapse Button */
+.app-collapse-btn {
+  position: absolute;
+  top: 50%;
+  right: -15px;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: none;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.app-collapse-btn:hover {
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+  transform: translateY(-50%) scale(1.05);
+}
+
+/* Logout Button */
+.app-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  margin-top: auto; /* ensures it's always at the bottom */
+  background: #1e293b;
+  color: #cbd5e1;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
+}
+
+.app-logout-btn:hover {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+  color: #fff;
+  transform: translateX(3px);
+}
+
+.app-logout-btn span {
+  white-space: nowrap;
+}
