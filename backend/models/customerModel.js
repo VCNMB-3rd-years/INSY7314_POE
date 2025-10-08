@@ -1,24 +1,18 @@
-// models/customerModel.js
-const mongoose = require("mongoose");
-
-const TransactionSchema = new mongoose.Schema({
-  transactionId: mongoose.Schema.Types.ObjectId,
-  status: String
-});
-
-const AccountSchema = new mongoose.Schema({
-  accountNumber: String,
-  bankId: { type: mongoose.Schema.Types.ObjectId, ref: "bankModel" },
-  transactions: [TransactionSchema]
-});
+const mongoose = require('mongoose');
 
 const CustomerSchema = new mongoose.Schema({
-  nationalId: String,
+  customerId: { type: String, default: () => crypto.randomUUID() },
+  nationalId: Number,
   firstName: String,
   lastName: String,
   username: String,
   password: String,
-  accounts: [AccountSchema]
+  //fk
+  customerBankId: [{ type: String, ref: "customerBankModel" }]
 });
+// we then define that the object references that schema, and give it a name
+const Customer = mongoose.model('Customer', CustomerSchema);
 
-module.exports = mongoose.model("customerModel", CustomerSchema);
+// finally we export our object, so that we can reference it in other files
+// we will use our object in the controllers, so that we can interface with the database
+module.exports = Customer;
