@@ -1,9 +1,6 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import Landing from "./pages/Landing.jsx";
 
 import Login from "./pages/account/Login.jsx";
 import Register from "./pages/account/Register.jsx";
@@ -21,7 +18,7 @@ function App() {
     <Router>
       <Routes>
         {/* Default Route */}
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/" element={<Landing />} />
 
         {/* Account Routes */}
         <Route path="/login" element={<Login />} />
