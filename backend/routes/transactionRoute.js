@@ -2,7 +2,7 @@
 const express = require('express');
 
 // call in our functions from the controller
-const { getTransaction, getTransactions, createTransaction, updateStatus} = require('../controllers/transactionController.js');
+const { getTransaction, getTransactions, createTransaction, updateStatus, deleteTransaction} = require('../controllers/transactionController.js');
 
 // set up our router instance
 const router = express.Router();
@@ -16,6 +16,6 @@ router.post('/createTransaction', createTransaction);
 // (verifying the swift code)
 // when updating a transaction, we want to update a SPECIFIC one, so we specify the ID
 router.put('/:id', updateStatus);
-
+router.delete('/:id', deleteTransaction);
 // finally we export our routes
 module.exports = router;

@@ -80,17 +80,44 @@ const updateStatus = async (req, res) => {
 
     // otherwise, we then update the updated fields
     // finally, ensure that the new version (post update) is returned, rather than the old transaction
-    transaction = await Transaction.findByIdAndUpdate(
+    const updatedTransaction = await Transaction.findByIdAndUpdate(
       id,
       { status, customerBankId},
       { new: true }
     );
     // spit it out encoded in json
-    res.status(202).json(transaction);
+    res.status(202).json(updatedTransaction);
   } catch (error) {
     // if things go south, spit out the error message
     res.status(500).json({ error: error.message });
   }
 };
 
-module.exports = { getTransactions, getTransaction, createTransaction, updateStatus};
+// DELETE: remove a transaction from existence
+const deleteTransaction = async (req, res) => {
+  // get the id of the transaction we want to remove
+  const id = req.params.id;
+
+  // null check
+  if (!id) {
+    res.status(400).json({ message: "Please provide an ID to delete." });
+  }
+
+  // first try find the transaction
+  try {
+    var transaction = await Transaction.findById(id);
+
+    // if no transaction, 404 and exit the method
+    if (!transaction) {
+      res.status(404).json({ message: "No transaction found that matches that ID." });
+    }
+
+    // find the transaction, delete it, and return what it was
+    transaction = await Transaction.findByIdAndDelete(id);
+    res.status(202).json(transaction);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { getTransactions, getTransaction, createTransaction, updateStatus, deleteTransaction};
