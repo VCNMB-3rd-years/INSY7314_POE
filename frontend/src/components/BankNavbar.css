@@ -1,23 +1,17 @@
 .bank-navbar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 2rem 4rem;
   background: #242424; /* default dark */
   color: #fff;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  box-shadow: 0 2px 8px rgba(58, 141, 222, 0.08);
 }
 
-.navbar-gradient {
-  background: linear-gradient(
-    135deg,
-    #0f2027,
-    #203a43,
-    #2c5364
-  ); /* matches hero */
-}
 
 .navbar-logo {
   display: flex;

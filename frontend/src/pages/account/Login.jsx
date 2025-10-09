@@ -1,88 +1,88 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import "./Login.css";
+import axios from "axios";
+import { Paper } from "@mui/material";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import BankNavbar from "../../components/BankNavbar";
+import "../../App.css";
 
 const Login = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  // Temporary users for testing
-  const mockUsers = [
-    {
-      username: "customer1",
-      accountNumber: "10001",
-      password: "1234",
-      type: "customer",
-    },
-    {
-      username: "employee1",
-      accountNumber: "20001",
-      password: "1234",
-      type: "employee",
-    },
-  ];
-
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
 
-    // Replace this with real backend call later
-    const user = mockUsers.find(
-      (u) =>
-        u.username === username &&
-        u.accountNumber === accountNumber &&
-        u.password === password
-    );
-
-    if (!user) {
-      setError("Invalid username, account number, or password");
+    if (!username || !password) {
+      setError("Username and password are required");
       return;
     }
 
-    // Redirect based on user type
-    if (user.type === "customer") navigate("/custDashboard");
-    else if (user.type === "employee") navigate("/empDashboard");
+    try {
+      const response = await axios.post("http://localhost:3000/login", {
+        username,
+        password,
+      });
+
+      const customer = response.data.customer;
+      if (!customer) {
+        setError("Login failed");
+        return;
+      }
+
+      localStorage.setItem("customer", JSON.stringify(customer));
+      navigate("/customer/dashboard");
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || "Server not reachable");
+    }
   };
 
   return (
-    <div
-      className="login-flex-wrapper"
-      style={{ minHeight: "100vh", overflow: "hidden" }}
-    >
-      <div className="login-form-container">
-        <h1>Login</h1>
-        <form className="login-form" onSubmit={handleLogin}>
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Account Number"
-            value={accountNumber}
-            onChange={(e) => setAccountNumber(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          {error && <p style={{ color: "#e74c3c" }}>{error}</p>}
-          <button type="submit">Login</button>
-        </form>
-      </div>
-      <div className="login-image-container">
-        <img src="/phone.jpg" alt="Coinnect Logo" />
-      </div>
-    </div>
+    <>
+      <BankNavbar userType="guest" />
+      <div className="auth-container">
+         <Paper elevation={20} className="auth-card">
+          <h2 className="auth-title">Login</h2>
+          <form onSubmit={handleLogin} className="auth-form">
+            <div className="input-group">
+              <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </div>
+            <div className="input-group">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <span
+                className="eye-icon"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+              </span>
+            </div>
+            {error && <p className="error-text">{error}</p>}
+            <button type="submit" className="auth-button">
+              Login
+            </button>
+            
+          </form>
+          </Paper>
+        </div>
+      
+    </>
   );
 };
 
