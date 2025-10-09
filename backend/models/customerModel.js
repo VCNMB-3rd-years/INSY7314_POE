@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const CustomerSchema = new mongoose.Schema({
   customerId: { type: String, default: () => crypto.randomUUID() },
@@ -11,9 +13,18 @@ const CustomerSchema = new mongoose.Schema({
   //fk
   //customerBankId: [{ type: String, ref: "customerBankModel" }]
 });
-// we then define that the object references that schema, and give it a name
-const Customer = mongoose.model('Customer', CustomerSchema);
 
-// finally we export our object, so that we can reference it in other files
-// we will use our object in the controllers, so that we can interface with the database
+// Hash password before saving
+CustomerSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+// Compare plain password with hashed password
+CustomerSchema.methods.comparePassword = async function(candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
+
+const Customer = mongoose.model('Customer', CustomerSchema);
 module.exports = Customer;
