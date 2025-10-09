@@ -1,15 +1,12 @@
-// models/employeeModel.js
 const mongoose = require('mongoose');
+const crypto = require('crypto');
 
 const EmployeeSchema = new mongoose.Schema({
   employeeId: { type: String, default: () => crypto.randomUUID() },
-  username: String,
-  password: String
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true }
 });
 
-// we then define that the object references that schema, and give it a name
+// Export model
 const Employee = mongoose.model('Employee', EmployeeSchema);
-
-// finally we export our object, so that we can reference it in other files
-// we will use our object in the controllers, so that we can interface with the database
 module.exports = Employee;

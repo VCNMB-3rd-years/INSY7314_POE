@@ -5,7 +5,7 @@ const Employee = require("../models/employeeModel.js");
 const { invalidateToken } = require("../middleware/authMiddleware.js");
 require("dotenv").config();
 
-// Helper: generate JWT
+// Helper: generate JWT with username and userType
 const generateJwt = (username, userType) => {
   return jwt.sign({ username, userType }, process.env.JWT_SECRET, { expiresIn: "1h" });
 };
@@ -23,7 +23,8 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     await userModel.create({ username, password: hashedPassword, ...rest });
 
-    res.status(200).json({ token: generateJwt(username, userType) });
+    const token = generateJwt(username, userType);
+    res.status(200).json({ message: `${userType} registered successfully`, token });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -39,14 +40,19 @@ const login = async (req, res) => {
 
     if (!user) return res.status(400).json({ message: "Invalid credentials." });
 
+    console.log("Incoming password:", password);
+    console.log("Stored hashed password:", user.password);
+
     const matching = await bcrypt.compare(password, user.password);
     if (!matching) return res.status(400).json({ message: "Invalid credentials." });
 
-    res.status(200).json({ token: generateJwt(username, userType) });
+    const token = generateJwt(username, userType);
+    res.status(200).json({ message: `${userType} logged in successfully`, token });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 // GET: Logout endpoint
 const logout = (req, res) => {
