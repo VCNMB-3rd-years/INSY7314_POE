@@ -21,7 +21,25 @@ const app = express();
 app.use(express.json({ limit: '20kb' }));
 
 // Basic security headers (X-Frame, CSP, XSS filters, etc.)
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy:
+      process.env.NODE_ENV === "production"
+        ? {
+            directives: {
+              defaultSrc: ["'self'"],
+              scriptSrc: ["'self'"],
+              styleSrc: ["'self'", "'unsafe-inline'"], // allow inline styles if needed
+              imgSrc: ["'self'"],
+              connectSrc: ["'self'"], // restrict API/WebSocket connections
+              objectSrc: ["'none'"],
+              upgradeInsecureRequests: [],
+            },
+          }
+        : false, // 🔓 disables CSP when running locally with Vite dev server
+    crossOriginEmbedderPolicy: false, // prevents CORS issues with Vite
+  })
+);
 
 // Logger: shows request info in dev
 app.use(morgan('dev'));
