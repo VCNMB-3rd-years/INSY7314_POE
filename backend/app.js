@@ -41,6 +41,17 @@ app.use(
   })
 );
 
+// Force HTTPS in production (redirect HTTP → HTTPS)
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.headers['x-forwarded-proto'] !== 'https') {
+      // Redirect to HTTPS
+      return res.redirect(`https://${req.headers.host}${req.url}`);
+    }
+    next();
+  });
+}
+
 // Logger: shows request info in dev
 app.use(morgan('dev'));
 
