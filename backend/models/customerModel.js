@@ -4,12 +4,14 @@ const crypto = require('crypto');
 
 const CustomerSchema = new mongoose.Schema({
   customerId: { type: String, default: () => crypto.randomUUID() },
-  nationalId: Number,
+  nationalId: String,
   firstName: String,
   lastName: String,
-  username: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  customerBankId: [{ type: String, ref: "customerBankModel" }]
+  username: String,
+  accountNumber: Number,
+  password: String,
+  //fk
+  //customerBankId: [{ type: String, ref: "customerBankModel" }]
 });
 
 // Hash password before saving

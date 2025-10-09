@@ -2,9 +2,12 @@ const mongoose = require('mongoose');
 
 const TransactionSchema = new mongoose.Schema({
   transactionId: { type: String, default: () => crypto.randomUUID() },
-  status: Boolean,
+  status: {type: Boolean, default: false},
+  recipientReference: String,
+  customerReference: String,
+  amount: Number,
   //fk
-  customerBankId: [{ type: String, ref: "customerBankModel" }]
+  customerId: [{ type: String,ref: "customerModel" }]
 });
 // we then define that the object references that schema, and give it a name
 const Transaction = mongoose.model('Transaction', TransactionSchema);

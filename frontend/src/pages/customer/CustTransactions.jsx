@@ -6,6 +6,18 @@ export default function CustTransactions() {
   const backToDash = () => {
     navigate("/custDashboard");
   };
+  
+const fetchTransactions = async () => {
+    // fetch all transactions using the apiService method we created earlier, storing the response in a temp variable
+    const res = await getTransactions();
+    // and update our transactions variable with the response data
+    setTransactions(res.data);
+  };
+  // this method will run as soon as the page is loaded
+  useEffect(() => {
+    // fetching all of the books in the background
+    fetchTransactions();
+  }, []);
 
   // Placeholder transaction data
   const transactions = [

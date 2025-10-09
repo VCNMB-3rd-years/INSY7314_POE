@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const { connectToMongo } = require('./services/dbService.js');
+const { securityMiddlewares } = require('./middlewares/securityMiddleware.js');
 
 // import routes
 const authRoute = require('./routes/authRoute.js');
@@ -48,6 +49,15 @@ if (process.env.NODE_ENV === 'production') {
       // Redirect to HTTPS
       return res.redirect(`https://${req.headers.host}${req.url}`);
     }
+// set up our security middleware
+securityMiddlewares(app);
+
+// log every request
+// the logger will look at the request, generate a response, then handle the next incoming request
+app.use((req, res, next) => {
+    // print out to the console (terminal) what type of method was used and to what endpoint that request was made
+    console.log(`${req.method} ${req.url}`)
+    // prepare to handle the next incoming request
     next();
   });
 }

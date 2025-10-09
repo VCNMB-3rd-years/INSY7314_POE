@@ -15,7 +15,7 @@ const generateJwt = (username, userType) => {
 
 // POST: Register endpoint
 const register = async (req, res) => {
-  const { userType, username, password, ...rest } = req.body;
+  const { userType, username, accountNumber, password, lastName, firstName, nationalId } = req.body;
 
   console.log("Register request body:", req.body);
 
@@ -32,7 +32,7 @@ const register = async (req, res) => {
     }
 
     // Create user; password will be hashed automatically by model's pre-save hook
-    const user = await UserModel.create({ username, password, ...rest });
+    const user = await UserModel.create({  username, password, accountNumber, lastName, firstName, nationalId});
 
     // Generate JWT
     const token = generateJwt(username, userType);
@@ -46,7 +46,7 @@ const register = async (req, res) => {
 
 // POST: Login endpoint
 const login = async (req, res) => {
-  const { userType, username, password } = req.body;
+  const { userType, username, accountNumber, password } = req.body;
 
   console.log("Login request body:", req.body);
 

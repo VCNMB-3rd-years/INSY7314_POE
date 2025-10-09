@@ -42,32 +42,37 @@ const getTransaction = async (req, res) => {
 
 // POST: create a transaction
 const createTransaction = async (req, res) => {
-  // from the request sent by the browser/frontend application, look in the body for the required fields
-  const { status, customerBankId} = req.body;
+  const { status, recipientReference, customerReference, amount } = req.body;
 
-  // checked that all information is provided
-  if (!status || !customerBankId) {
-    res
-      .status(400)
-      .json({ message: "Please ensure that all fields are provided for the transaction." });
+  // Make sure the customerId comes from the logged-in user
+  const customerId = req.user.customerId;
+
+  if (!recipientReference || !customerReference || !amount) {
+    return res.status(400).json({ message: "Please provide all required fields." });
   }
 
   try {
-    // create a new transaction instance using the information provided to us
-    const transaction = await Transaction.create({ status, customerBankId});
-    // and return code 201 (created), alongside the object we just added to the database
+    const transaction = await Transaction.create({
+      status: status,
+      recipientReference,
+      customerReference,
+      amount,
+      customerId
+    });
+
     res.status(201).json(transaction);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
+
 // PUT: verify swift transaction code
 const updateStatus = async (req, res) => {
   // first we get the ID from the url
   const id = req.params.id;
   // then the updated information from the body
-  const { status, customerBankId} = req.body;
+  const { status, recipientReference, customerReference, amount, customerId} = req.body;
 
   try {
     // firstly find the transaction we need to update
@@ -82,7 +87,7 @@ const updateStatus = async (req, res) => {
     // finally, ensure that the new version (post update) is returned, rather than the old transaction
     const updatedTransaction = await Transaction.findByIdAndUpdate(
       id,
-      { status, customerBankId},
+      { status, recipientReference, customerReference, amount, customerId},
       { new: true }
     );
     // spit it out encoded in json
