@@ -17,3 +17,9 @@ export const updateStatus = (id, transactionData) => axios.put(`/transaction/${i
 //Customer endpoints
 // PUT request, to update an existing customer
 export const updateCustomer = (id, customerData) => axios.put(`/customer/${id}`, customerData);
+
+// POST to register a user
+export const register = (customerData) => axios.post('/auth/register', customerData);
+
+// POST to login a user
+export const login = (customerData) => axios.post('/auth/login', customerData);

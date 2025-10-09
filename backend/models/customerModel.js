@@ -2,10 +2,11 @@ const mongoose = require('mongoose');
 
 const CustomerSchema = new mongoose.Schema({
   customerId: { type: String, default: () => crypto.randomUUID() },
-  nationalId: Number,
+  nationalId: String,
   firstName: String,
   lastName: String,
-  username: Number, //this is the account number
+  username: String,
+  accountNumber: Number,
   password: String,
   //fk
   //customerBankId: [{ type: String, ref: "customerBankModel" }]

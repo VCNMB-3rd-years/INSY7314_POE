@@ -1,116 +1,103 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import "./Register.css";
+import { register } from "../../services/apiService";
 
 const Register = () => {
   const navigate = useNavigate();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [nationalId, setNationalId] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState(""); // "success" or "error"
+
+  const [customerData, setCustomerData] = useState({
+    firstName: "",
+    lastName: "",
+    nationalId: "",
+    accountNumber: "",
+    username: "",
+    password: "",
+  });
   const [error, setError] = useState("");
 
-  // Temporary users for testing
-  const mockUsers = [
-    {
-      fullName: "John Doe",
-      idNumber: "1234567890",
-      accountNumber: "10001",
-      password: "1234",
-      type: "customer",
-    },
-    {
-      fullName: "Jane Smith",
-      idNumber: "9876543210",
-      accountNumber: "20001",
-      password: "1234",
-      type: "employee",
-    },
-  ];
-
   const handleRegister = async (e) => {
-  e.preventDefault();
-  setError(""); // clear previous errors
+    e.preventDefault();
+    setError("");
 
-  try {
-    // Prepare the data to send to the backend
-    const requestBody = {
-      userType: "customer",  // or "employee" based on your form
-      username,
-      password,
-      nationalId,
-      firstName,
-      lastName
-    };
+    try {
+      const response = await register(customerData); // axios call
+      setMessage("Transaction created successfully!");
+      setMessageType("success");
+      const data = response.data;
 
-    // Call your backend register endpoint
-    const response = await fetch("http://localhost:3000/v1/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestBody)
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      setError(data.message || "Registration failed");
-      return;
+      // So if you get here, registration succeeded
+      navigate("/login");
+    } catch (err) {
+      // Axios errors store the server response in err.response
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Server error: " + err.message);
+      }
     }
+  };
 
-    // Successful registration: redirect based on type
-    if (requestBody.userType === "customer") navigate("/custDashboard");
-    else if (requestBody.userType === "employee") navigate("/empDashboard");
-  } catch (err) {
-    setError("Server error: " + err.message);
-  }
-};
-
+  const handleChange = (e) => {
+    setCustomerData({ ...customerData, [e.target.name]: e.target.value });
+  };
 
   return (
-    <div
-      className="register-flex-wrapper"
-      style={{ minHeight: "100vh", overflow: "hidden" }}
-    >
+    <div className="register-flex-wrapper" style={{ minHeight: "100vh", overflow: "hidden" }}>
       <div className="register-form-container">
         <h1>Register</h1>
         <form className="register-form" onSubmit={handleRegister}>
           <input
             type="text"
+            name="firstName"
             placeholder="First Name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
+            value={customerData.firstName}
+            onChange={handleChange}
             required
           />
           <input
             type="text"
+            name="lastName"
             placeholder="Last Name"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
+            value={customerData.lastName}
+            onChange={handleChange}
             required
           />
           <input
             type="text"
+            name="nationalId"
             placeholder="ID Number"
-            value={nationalId}
-            onChange={(e) => setNationalId(e.target.value)}
+            value={customerData.nationalId}
+            onChange={handleChange}
             required
           />
           <input
             type="text"
+            name="accountNumber"
             placeholder="Account Number"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={customerData.accountNumber}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={customerData.username}
+            onChange={handleChange}
             required
           />
           <input
             type="password"
+            name="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={customerData.password}
+            onChange={handleChange}
             required
           />
-          {error && <p>{error}</p>}
+          {error && <p style={{ color: "red" }}>{error}</p>}
           <button type="submit">Register</button>
         </form>
       </div>
