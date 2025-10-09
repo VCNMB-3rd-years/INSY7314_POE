@@ -3,7 +3,7 @@ const Employee = require("../models/employeeModel.js");
 
 // POST: Register endpoint
 const register = async (req, res) => {
-  const { userType, username, password, ...rest } = req.body;
+  const { userType, username, password, lastName, firstName, nationalId } = req.body;
 
   try {
     let userModel = userType === "employee" ? Employee : Customer;
@@ -11,7 +11,7 @@ const register = async (req, res) => {
     const exists = await userModel.findOne({ username });
     if (exists) return res.status(400).json({ message: "Username already exists." });
 
-    await userModel.create({ username, password, ...rest });
+    await userModel.create({ username, password, lastName, firstName, nationalId});
     res.status(200).json({ message: `${userType} registered successfully.` });
   } catch (err) {
     res.status(500).json({ error: err.message });

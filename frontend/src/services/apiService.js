@@ -1,0 +1,19 @@
+// import our singleton for axios
+import axios from '../interfaces/axiosInstance.js'
+
+//Transaction endpoints
+// GET all the transactions from the API
+export const getTransactions = () => axios.get('/transaction/getTransactions');
+
+// GET a specific transaction
+export const getTransaction = (id) => axios.get(`/transaction/${id}`);
+
+// POST request, to create a new transaction
+export const createTransaction = (transactionData) => axios.post('/transaction/createTransaction', transactionData);
+
+// PUT request, to update an existing transaction
+export const updateStatus = (id, transactionData) => axios.put(`/transaction/${id}`, transactionData);
+
+//Customer endpoints
+// PUT request, to update an existing customer
+export const updateCustomer = (id, customerData) => axios.put(`/customer/${id}`, customerData);

@@ -4,9 +4,10 @@ import "./Register.css";
 
 const Register = () => {
   const navigate = useNavigate();
-  const [fullName, setFullName] = useState("");
-  const [idNumber, setIdNumber] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [nationalId, setNationalId] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
@@ -28,27 +29,43 @@ const Register = () => {
     },
   ];
 
-  const handleRegister = (e) => {
-    e.preventDefault();
+  const handleRegister = async (e) => {
+  e.preventDefault();
+  setError(""); // clear previous errors
 
-    // Replace this with real backend call later
-    const user = mockUsers.find(
-      (u) =>
-        u.fullName === fullName &&
-        u.idNumber === idNumber &&
-        u.accountNumber === accountNumber &&
-        u.password === password
-    );
+  try {
+    // Prepare the data to send to the backend
+    const requestBody = {
+      userType: "customer",  // or "employee" based on your form
+      username,
+      password,
+      nationalId,
+      firstName,
+      lastName
+    };
 
-    if (!user) {
-      setError("Invalid registration details");
+    // Call your backend register endpoint
+    const response = await fetch("http://localhost:3000/v1/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setError(data.message || "Registration failed");
       return;
     }
 
-    // Redirect based on user type
-    if (user.type === "customer") navigate("/custDashboard");
-    else if (user.type === "employee") navigate("/empDashboard");
-  };
+    // Successful registration: redirect based on type
+    if (requestBody.userType === "customer") navigate("/custDashboard");
+    else if (requestBody.userType === "employee") navigate("/empDashboard");
+  } catch (err) {
+    setError("Server error: " + err.message);
+  }
+};
+
 
   return (
     <div
@@ -60,23 +77,30 @@ const Register = () => {
         <form className="register-form" onSubmit={handleRegister}>
           <input
             type="text"
-            placeholder="Full Name"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            placeholder="First Name"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Last Name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
             required
           />
           <input
             type="text"
             placeholder="ID Number"
-            value={idNumber}
-            onChange={(e) => setIdNumber(e.target.value)}
+            value={nationalId}
+            onChange={(e) => setNationalId(e.target.value)}
             required
           />
           <input
             type="text"
             placeholder="Account Number"
-            value={accountNumber}
-            onChange={(e) => setAccountNumber(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
           <input

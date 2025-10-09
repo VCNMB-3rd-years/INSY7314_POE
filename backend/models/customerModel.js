@@ -5,10 +5,10 @@ const CustomerSchema = new mongoose.Schema({
   nationalId: Number,
   firstName: String,
   lastName: String,
-  username: String,
+  username: Number, //this is the account number
   password: String,
   //fk
-  customerBankId: [{ type: String, ref: "customerBankModel" }]
+  //customerBankId: [{ type: String, ref: "customerBankModel" }]
 });
 // we then define that the object references that schema, and give it a name
 const Customer = mongoose.model('Customer', CustomerSchema);
