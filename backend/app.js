@@ -41,6 +41,15 @@ app.use(
   })
 );
 
+// HSTS (HTTP Strict Transport Security) for 1 year
+app.use(
+  helmet.hsts({
+    maxAge: 31536000, // 1 year in seconds
+    includeSubDomains: true,
+    preload: true,
+  })
+);
+
 // Force HTTPS in production (redirect HTTP → HTTPS)
 if (process.env.NODE_ENV === 'production') {
   app.use((req, res, next) => {
