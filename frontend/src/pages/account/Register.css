@@ -1,0 +1,119 @@
+.register-flex-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  min-height: 90vh;
+  max-width: 900px;
+  margin: 3rem auto;
+  gap: 1rem;
+  border-radius: 32px;
+  background: transparent;
+}
+
+.register-image-container,
+.register-form-container {
+  flex: 1;
+  min-height: 50vh;
+  border-radius: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+  padding: 0;
+  overflow: hidden;
+}
+
+.register-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 32px;
+  display: block;
+}
+
+.register-form-container {
+  background: #1e1e1e;
+  border-radius: 32px;
+  padding: 3rem 2rem;
+  flex-direction: column;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.register-form-container h1 {
+  margin-bottom: 1rem;
+  color: #e6f0ff;
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.register-form input {
+  padding: 0.8rem 1rem;
+  border: 1px solid #2d3748;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #111827;
+  color: #e6f0ff;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.register-form input:focus {
+  border: 1.5px solid #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+.register-form button {
+  padding: 0.8rem 1rem;
+  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+}
+
+.register-form button:hover {
+  background: linear-gradient(90deg, #60a5fa 0%, #3b82f6 100%);
+  transform: translateY(-2px);
+}
+
+.register-form p {
+  margin: 0;
+  color: #ef4444;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .register-flex-wrapper {
+    flex-direction: column;
+    max-width: 95vw;
+    border-radius: 32px;
+  }
+  .register-image-container,
+  .register-form-container {
+    border-radius: 32px;
+    min-height: 250px;
+    max-width: 100%;
+    padding: 2rem 1rem;
+  }
+  .register-image-container img {
+    border-radius: 32px;
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+}

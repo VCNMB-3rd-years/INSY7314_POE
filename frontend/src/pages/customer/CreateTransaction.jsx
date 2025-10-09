@@ -1,15 +1,125 @@
-import { Navigate, useNavigate } from  "react-router-dom"
+import { useNavigate } from "react-router-dom";
+import AppSidebar from "../../components/AppSidebar";
 
-export default function VerifySwift() {
-    const navigate = useNavigate()
-    const backToDash = () => {
-        navigate("/custDashboard")
-    }
+export default function CreateTransaction() {
+  const navigate = useNavigate();
+  const backToDash = () => {
+    navigate("/custDashboard");
+  };
 
-    return(
-        <div>
-            <h1>Create A Transaction</h1>
-            <button onClick={backToDash}>Back to Dashboard</button>
+  return (
+    <div
+      style={{
+        display: "flex",
+        minHeight: "100vh",
+        background: "#1a1a1a",
+        fontFamily: "Inter, sans-serif",
+      }}
+    >
+      <AppSidebar userType="customer" />
+      <div
+        style={{
+          flex: 1,
+          padding: "3rem 2rem",
+          color: "#fff",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <div
+          style={{
+            background: "#2a2a2a",
+            padding: "2rem",
+            borderRadius: "1rem",
+            boxShadow: "0 8px 20px rgba(0,0,0,0.3)",
+            width: "100%",
+            maxWidth: "420px",
+          }}
+        >
+          <h1 style={{ fontSize: "1.8rem", marginBottom: "0.5rem" }}>
+            Create Transaction
+          </h1>
+          <p
+            style={{ color: "#bbb", marginBottom: "2rem", fontSize: "0.95rem" }}
+          >
+            Fill in the details below to send money securely and instantly to
+            another account.
+          </p>
+
+          {/* Form */}
+          <form
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "1.2rem",
+            }}
+          >
+            <input
+              type="text"
+              placeholder="Recipient Account"
+              required
+              style={inputStyle}
+            />
+            <input
+              type="number"
+              placeholder="Amount"
+              required
+              style={inputStyle}
+            />
+            <input type="text" placeholder="Reference" style={inputStyle} />
+
+            <button type="submit" style={buttonPrimaryStyle}>
+              Send Transaction
+            </button>
+          </form>
+
+          <button
+            style={{
+              ...buttonSecondaryStyle,
+              marginTop: "1.5rem",
+            }}
+            onClick={backToDash}
+          >
+            Back to Dashboard
+          </button>
         </div>
-    )
+      </div>
+    </div>
+  );
 }
+
+const inputStyle = {
+  padding: "0.9rem 1rem",
+  borderRadius: "0.6rem",
+  border: "1px solid #444",
+  background: "#1e1e1e",
+  color: "#fff",
+  fontSize: "0.95rem",
+  outline: "none",
+  transition: "border 0.2s, box-shadow 0.2s",
+};
+
+const buttonPrimaryStyle = {
+  padding: "0.9rem 1rem",
+  borderRadius: "0.6rem",
+  border: "none",
+  background: "linear-gradient(135deg, #4a90e2, #357ab8)",
+  color: "#fff",
+  fontSize: "1rem",
+  fontWeight: "600",
+  cursor: "pointer",
+  transition: "background 0.3s, transform 0.2s",
+};
+
+const buttonSecondaryStyle = {
+  padding: "0.9rem 1rem",
+  borderRadius: "0.6rem",
+  border: "1px solid #666",
+  background: "transparent",
+  color: "#bbb",
+  fontSize: "1rem",
+  fontWeight: "500",
+  cursor: "pointer",
+  transition: "background 0.3s, transform 0.2s",
+};
