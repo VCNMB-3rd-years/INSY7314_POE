@@ -9,11 +9,21 @@ const bankRoute = require('./routes/bankRoute.js');
 const customerRoute = require('./routes/customerRoute.js');
 const transactionRoute = require('./routes/transactionRoute.js');
 
+//Input Sanitization imports
+const mongoSanitize = require('express-mongo-sanitize')
+const xss = require('xss-clean')
+
 // setting up express using the default parameters
 const app = express();
 
 // calling in express.json middleware, so that our app can handle json
 app.use(express.json());
+
+//Prevents  NoSQL query injection
+app.use(mongoSanitize())
+
+//Prevents site script xss
+app.use(xss())
 
 // log every request
 // the logger will look at the request, generate a response, then handle the next incoming request
