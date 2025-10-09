@@ -9,19 +9,34 @@ const {
 
 const validateRequest = require('../middleware/validateRequest');
 const customerSchemas = require('../schemas/customerSchemas.js');
+const { verifyToken } = require('../middleware/authMiddleware.js');
 
 const router = express.Router();
 
 // PUT /api/customers/:id
-router.put('/:id', validateRequest(customerSchemas.updateCustomer), updateCustomer);
+router.put(
+  '/:id',
+  verifyToken, // <--- protect this route
+  validateRequest(customerSchemas.updateCustomer),
+  updateCustomer
+);
 
 // GET /api/customers/getCustomers
-router.get('/getCustomers', getCustomers);
+router.get('/getCustomers', verifyToken, getCustomers);
 
 // GET /api/customers/:id
-router.get('/:id', validateRequest(customerSchemas.getCustomer), getCustomer);
+router.get(
+  '/:id',
+  verifyToken,
+  validateRequest(customerSchemas.getCustomer),
+  getCustomer
+);
 
 // DELETE /api/customers/:id
-router.delete('/:id', validateRequest(customerSchemas.deleteCustomer), deleteCustomer);
-
+router.delete(
+  '/:id',
+  verifyToken,
+  validateRequest(customerSchemas.deleteCustomer),
+  deleteCustomer
+);
 module.exports = router;

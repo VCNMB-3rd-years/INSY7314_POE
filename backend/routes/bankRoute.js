@@ -1,4 +1,4 @@
-// server/routes/banks.js
+// server/routes/bankRoutes.js
 const express = require('express');
 const {
   getBanks,
@@ -10,22 +10,43 @@ const {
 
 const validateRequest = require('../middleware/validateRequest');
 const bankSchemas = require('../schemas/bankSchemas.js');
+const { verifyToken } = require('../middleware/authMiddleware.js');
 
 const router = express.Router();
 
-// GET /api/banks/getBanks
-router.get('/getBanks', getBanks);
+// Middleware to check if the user is an employee
+const requireEmployee = (req, res, next) => {
+  if (req.user.userType !== 'employee') {
+    return res.status(403).json({ message: 'Access denied: employees only' });
+  }
+  next();
+};
 
-// GET /api/banks/:id
-router.get('/:id', validateRequest(bankSchemas.getBank), getBank);
+// GET all banks - any authenticated user
+router.get('/getBanks', verifyToken, getBanks);
 
-// POST /api/banks/createBank
-router.post('/createBank', validateRequest(bankSchemas.createBank), createBank);
+// GET specific bank - any authenticated user
+router.get('/:id', verifyToken, getBank);
 
-// PUT /api/banks/:id
-router.put('/:id', validateRequest(bankSchemas.updateBank), updateBank);
+// CREATE a bank - employees only
+router.post(
+  '/createBank',
+  verifyToken,
+  requireEmployee,
+  validateRequest(bankSchemas.createBank),
+  createBank
+);
 
-// DELETE /api/banks/:id
-router.delete('/:id', validateRequest(bankSchemas.getBank), deleteBank);
+// UPDATE a bank - employees only
+router.put(
+  '/:id',
+  verifyToken,
+  requireEmployee,
+  validateRequest(bankSchemas.updateBank),
+  updateBank
+);
+
+// DELETE a bank - employees only
+router.delete('/:id', verifyToken, requireEmployee, deleteBank);
 
 module.exports = router;
