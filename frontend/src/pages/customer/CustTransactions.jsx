@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import AppSidebar from "../../components/AppSidebar";
+import { getTransaction } from "../../services/apiService";
 
 export default function CustTransactions() {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ export default function CustTransactions() {
   
 const fetchTransactions = async () => {
     // fetch all transactions using the apiService method we created earlier, storing the response in a temp variable
-    const res = await getTransactions();
+    const res = await getTransaction();
     // and update our transactions variable with the response data
     setTransactions(res.data);
   };
@@ -18,12 +19,6 @@ const fetchTransactions = async () => {
     // fetching all of the books in the background
     fetchTransactions();
   }, []);
-
-  // Placeholder transaction data
-  const transactions = [
-    { id: 1, recipient: "12345678", amount: "R500", reference: "Groceries" },
-    { id: 2, recipient: "87654321", amount: "R1200", reference: "Rent" },
-  ];
 
   return (
     <div

@@ -7,9 +7,9 @@ const {
   deleteCustomer
 } = require('../controllers/customerController.js');
 
-const validateRequest = require('../middleware/validateRequest');
+const validateRequest = require('../middlewares/validateRequest');
 const customerSchemas = require('../schemas/customerSchemas.js');
-const { verifyToken } = require('../middleware/authMiddleware.js');
+const { verifyToken } = require('../middlewares/authMiddleware.js');
 
 const router = express.Router();
 

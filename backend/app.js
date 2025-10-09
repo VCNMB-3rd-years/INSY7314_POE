@@ -49,6 +49,9 @@ if (process.env.NODE_ENV === 'production') {
       // Redirect to HTTPS
       return res.redirect(`https://${req.headers.host}${req.url}`);
     }
+    next();
+  });
+} 
 // set up our security middleware
 securityMiddlewares(app);
 
@@ -60,7 +63,6 @@ app.use((req, res, next) => {
     // prepare to handle the next incoming request
     next();
   });
-}
 
 // Logger: shows request info in dev
 app.use(morgan('dev'));
@@ -93,3 +95,4 @@ connectToMongo();
 app.listen(port, () => {
   console.log(`✅ Secure API listening on port ${port}`);
 });
+
