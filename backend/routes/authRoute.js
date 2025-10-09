@@ -1,13 +1,32 @@
-const express = require('express')
+const express = require('express');
+const { register, login, logout } = require('../controllers/authController.js');
+const validateRequest = require('../middleware/validateRequest');
 
-const { register, login, logout} = require('../controllers/authController.js')
+const router = express.Router();
 
-const router = express.Router()
-//login and register are POST requests
-//this is because we require the username and password from the user
-router.post('/login', login)
-router.post('/register', register)
-//logout is a GET request, as we just reading the token from the request header
-router.get('/logout', logout)
+// Schema for register
+const registerSchema = {
+  body: {
+    userType: /^(customer|employee)$/,
+    username: 'username',
+    password: 'password',
+    firstName: 'fullName',
+    lastName: 'fullName',
+    nationalId: 'nationalId'
+  }
+};
 
-module.exports = router
+// Schema for login
+const loginSchema = {
+  body: {
+    userType: /^(customer|employee)$/,
+    username: 'username',
+    password: 'password'
+  }
+};
+
+router.post('/register', validateRequest(registerSchema), register);
+router.post('/login', validateRequest(loginSchema), login);
+router.get('/logout', logout);
+
+module.exports = router;

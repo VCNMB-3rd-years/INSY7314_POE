@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+
 const mongoose = require('mongoose');
 
 const CustomerSchema = new mongoose.Schema({
