@@ -41,6 +41,13 @@ app.use(
   })
 );
 
+
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+
+app.use(mongoSanitize());
+app.use(xss());
+
 // HSTS (HTTP Strict Transport Security) for 1 year
 app.use(
   helmet.hsts({

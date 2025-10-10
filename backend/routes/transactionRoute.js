@@ -9,7 +9,7 @@ const {
 
 const validateRequest = require('../middleware/validateRequest');
 const txSchemas = require('../schemas/transactionSchemas.js');
-const { verifyToken, authorizeRole } = require('../middleware/authMiddleware.js');
+const { verifyToken, authorizeRole, } = require('../middleware/authMiddleware.js');
 
 const router = express.Router();
 
