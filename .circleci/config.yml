@@ -121,15 +121,12 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - run:
-          name: Install Sonar Scanner locally
-          command: |
-            npm install sonar-scanner
+          name: Fix sonar-scanner permissions
+          command: chmod +x ./node_modules/sonar-scanner/bin/sonar-scanner
       - run:
           name: Run SonarQube analysis
           command: |
             SONAR_BRANCH="${CIRCLE_BRANCH:-master}"
-            echo "Sonar branch value is: $SONAR_BRANCH"
-            echo "Sonar org value is: $SONAR_ORG"
             npx sonar-scanner \
               -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
               -Dsonar.organization="$SONAR_ORG" \
@@ -138,6 +135,7 @@ jobs:
               -Dsonar.login="$SONAR_TOKEN" \
               -Dsonar.branch.name="$SONAR_BRANCH" \
               -Dsonar.sources="."
+
 
 workflows:
   version: 2
