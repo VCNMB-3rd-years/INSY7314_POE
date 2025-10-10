@@ -14,6 +14,10 @@ const bankRoute = require("./routes/bankRoute.js");
 const customerRoute = require("./routes/customerRoute.js");
 const transactionRoute = require("./routes/transactionRoute.js");
 
+//Input Sanitization imports
+// const mongoSanitize = require('express-mongo-sanitize')
+//const xss = require('xss-clean')
+
 // initialize express
 const app = express();
 
@@ -50,6 +54,9 @@ if (process.env.NODE_ENV === 'production') {
       // Redirect to HTTPS
       return res.redirect(`https://${req.headers.host}${req.url}`);
     }
+    next();
+  });
+} 
 // set up our security middleware
 securityMiddlewares(app);
 
@@ -61,7 +68,6 @@ app.use((req, res, next) => {
     // prepare to handle the next incoming request
     next();
   });
-}
 
 // Logger: shows request info in dev
 app.use(morgan("dev"));
@@ -101,3 +107,4 @@ connectToMongo();
 https.createServer(options, app).listen(port, () => {
   console.log(`✅ Secure API running on https://localhost:${port}`);
 });
+

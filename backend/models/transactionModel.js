@@ -6,6 +6,7 @@ const TransactionSchema = new mongoose.Schema({
   recipientReference: String,
   customerReference: String,
   amount: Number,
+  swiftCode: String,
   //fk
   customerId: [{ type: String,ref: "customerModel" }]
 });

@@ -1,44 +1,63 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppSidebar from "../../components/AppSidebar";
-import { createTransaction } from "../../services/apiService";
+import { createTransaction as apiCreateTransaction } from "../../services/apiService";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 export default function CreateTransaction() {
   const navigate = useNavigate();
+  const { token, user } = useAuth(); // Get token and user info
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState(""); // "success" or "error"
 
   const [transactionData, setTransactionData] = useState({
-    status: "",
     recipientReference: "",
     customerReference: "",
     amount: "",
-    customerBankId: "",
+    swiftCode: "",
+    status: "",
   });
+
+  const handleChange = (e) => {
+    setTransactionData({ ...transactionData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!token || !user) {
+      setMessage("You must be logged in to create a transaction.");
+      setMessageType("error");
+      return;
+    }
+
+    // Prepare payload for backend
+    const payload = {
+      status: false,
+      recipientReference: transactionData.recipientReference,
+      customerReference: transactionData.customerReference,
+      amount: Number(transactionData.amount),
+      customerId: user.customerId,
+      swiftCode: transactionData.swiftCode, 
+    };
+
     try {
-      await createTransaction(transactionData);
+      await apiCreateTransaction(payload, token); // pass token to API
       setMessage("Transaction created successfully!");
       setMessageType("success");
 
-      // reset form
+      // Reset form
       setTransactionData({
-        status: "",
         recipientReference: "",
         customerReference: "",
         amount: "",
-        customerBankId: "",
+        swiftCode: "",
       });
     } catch (err) {
-      setMessage("Failed to create transaction.");
+      console.error("Transaction creation error:", err.response?.data || err.message);
+      setMessage(err.response?.data?.message || "Failed to create transaction.");
       setMessageType("error");
     }
-  };
-
-  const backToDash = () => {
-    navigate("/custDashboard");
   };
 
   return (
@@ -71,16 +90,12 @@ export default function CreateTransaction() {
             maxWidth: "420px",
           }}
         >
-          <h1 style={{ fontSize: "1.8rem", marginBottom: "0.5rem" }}>
-            Create Transaction
-          </h1>
+          <h1 style={{ fontSize: "1.8rem", marginBottom: "0.5rem" }}>Create Transaction</h1>
 
-          {/* ✅ Success / Error Message */}
           {message && (
             <div
               style={{
-                background:
-                  messageType === "success" ? "#2e7d32" : "#c62828",
+                background: messageType === "success" ? "#2e7d32" : "#c62828",
                 color: "white",
                 padding: "0.75rem",
                 borderRadius: "0.5rem",
@@ -94,41 +109,46 @@ export default function CreateTransaction() {
 
           <form
             onSubmit={handleSubmit}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "1.2rem",
-            }}
+            style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}
           >
             <input
               type="number"
+              name="amount"
               placeholder="Amount"
               required
               style={inputStyle}
               value={transactionData.amount}
-              onChange={(e) =>
-                setTransactionData({ ...transactionData, amount: e.target.value })
-              }
+              onChange={handleChange}
             />
 
             <input
               type="text"
+              name="customerReference"
               placeholder="Customer Reference"
+              required
               style={inputStyle}
               value={transactionData.customerReference}
-              onChange={(e) =>
-                setTransactionData({ ...transactionData, customerReference: e.target.value })
-              }
+              onChange={handleChange}
             />
+
             <input
               type="text"
+              name="recipientReference"
               placeholder="Recipient Reference"
               required
               style={inputStyle}
               value={transactionData.recipientReference}
-              onChange={(e) =>
-                setTransactionData({ ...transactionData, recipientReference: e.target.value })
-              }
+              onChange={handleChange}
+            />
+
+            <input
+              type="text"
+              name="swiftCode"
+              placeholder="Swift Code"
+              required
+              style={inputStyle}
+              value={transactionData.swiftCode}
+              onChange={handleChange}
             />
 
             <button type="submit" style={buttonPrimaryStyle}>
@@ -137,11 +157,8 @@ export default function CreateTransaction() {
           </form>
 
           <button
-            style={{
-              ...buttonSecondaryStyle,
-              marginTop: "1.5rem",
-            }}
-            onClick={backToDash}
+            style={{ ...buttonSecondaryStyle, marginTop: "1.5rem" }}
+            onClick={() => navigate("/custDashboard")}
           >
             Back to Dashboard
           </button>
@@ -151,37 +168,31 @@ export default function CreateTransaction() {
   );
 }
 
+// Shared input/button styles
 const inputStyle = {
-  padding: "0.9rem 1rem",
+  padding: "0.75rem 1rem",
   borderRadius: "0.6rem",
-  border: "1px solid #444",
-  background: "#1e1e1e",
+  border: "1px solid #555",
+  background: "#1a1a1a",
   color: "#fff",
-  fontSize: "0.95rem",
-  outline: "none",
-  transition: "border 0.2s, box-shadow 0.2s",
+  fontSize: "1rem",
 };
 
 const buttonPrimaryStyle = {
-  padding: "0.9rem 1rem",
+  padding: "0.85rem",
   borderRadius: "0.6rem",
   border: "none",
-  background: "linear-gradient(135deg, #4a90e2, #357ab8)",
+  background: "#007bff",
   color: "#fff",
-  fontSize: "1rem",
   fontWeight: "600",
   cursor: "pointer",
-  transition: "background 0.3s, transform 0.2s",
 };
 
 const buttonSecondaryStyle = {
-  padding: "0.9rem 1rem",
+  padding: "0.75rem",
   borderRadius: "0.6rem",
-  border: "1px solid #666",
+  border: "1px solid #555",
   background: "transparent",
-  color: "#bbb",
-  fontSize: "1rem",
-  fontWeight: "500",
+  color: "#fff",
   cursor: "pointer",
-  transition: "background 0.3s, transform 0.2s",
 };

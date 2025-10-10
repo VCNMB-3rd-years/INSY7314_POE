@@ -8,19 +8,26 @@ const {
   deleteTransaction
 } = require('../controllers/transactionController.js');
 
-const validateRequest = require('../middleware/validateRequest');
+const validateRequest = require('../middlewares/validateRequest');
 const txSchemas = require('../schemas/transactionSchemas.js');
+
+const { verifyToken } = require("../middlewares/authMiddleware.js");
 
 const router = express.Router();
 
 // GET /api/transactions/getTransactions
 router.get('/getTransactions', getTransactions);
 
-// GET /api/transactions/:id
-router.get('/:id', validateRequest(txSchemas.getTransaction), getTransaction);
+// GET /transaction/customer/:customerId
+router.get('/customer/:customerId', getTransaction);
 
 // POST /api/transactions/createTransaction
-router.post('/createTransaction', validateRequest(txSchemas.createTransaction), createTransaction);
+router.post(
+  '/createTransaction',
+  verifyToken,  
+  validateRequest(txSchemas.createTransaction),
+  createTransaction
+);
 
 // PUT /api/transactions/:id
 router.put('/:id', validateRequest(txSchemas.updateStatus), updateStatus);
