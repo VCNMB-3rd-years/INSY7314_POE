@@ -1,27 +1,19 @@
+/ controllers/transactionController.js
 const Transaction = require("../models/transactionModel.js");
 
-// GET all transactions
+// GET: all transaction
 const getTransactions = async (req, res) => {
   try {
-    let transactions;
-    if (req.user.userType === 'employee') {
-      // employees see all transactions
-      transactions = await Transaction.find({});
-    } else {
-      // customers see only their transactions
-      transactions = await Transaction.find({ customerId: req.user.customerId });
-    }
+    const transactions = await Transaction.find({});
+    // return the transactions
     res.status(200).json(transactions);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// GET a transaction by ID
 // GET: all transactions for a specific customer
 const getTransaction = async (req, res) => {
-  const id = req.params.id;
-  if (!id) return res.status(400).json({ message: "Transaction ID is required." });
   const customerId = req.params.customerId;
 
   if (!customerId) {
@@ -29,38 +21,21 @@ const getTransaction = async (req, res) => {
   }
 
   try {
-    const transaction = await Transaction.findById(id);
-    if (!transaction) return res.status(404).json({ message: "Transaction not found." });
-
-    // Customers can only access their own transactions
-    if (req.user.userType === 'customer' && transaction.customerId !== req.user.customerId) {
-      return res.status(403).json({ message: "Forbidden: not your transaction." });
     const transactions = await Transaction.find({ customerId });
 
     if (!transactions || transactions.length === 0) {
       return res.status(404).json({ message: "No transactions found for this customer." });
     }
 
-    res.status(200).json(transaction);
     res.status(200).json({ transactions });
   } catch (error) {
-    res.status(500).json({ error: error.message });
     console.error("Error fetching transactions:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-// POST create transaction
+
+// POST: create a transaction
 const createTransaction = async (req, res) => {
-  const { status } = req.body;
-  const customerId = req.user.customerId;
-
-  if (!status) {
-    return res.status(400).json({ message: "Transaction status is required." });
-  }
-
-  try {
-    const transaction = await Transaction.create({ status, customerId });
-    res.status(201).json(transaction);
   try {
     // Ensure the user is logged in and has an ID
     if (!req.user || !req.user.customerId) {
@@ -100,17 +75,10 @@ const createTransaction = async (req, res) => {
   }
 };
 
-// PUT update status (employees only)
+// PUT: verify swift transaction code
 const updateStatus = async (req, res) => {
+  // first we get the ID from the url
   const id = req.params.id;
-  const { status } = req.body;
-
-  if (!status && status !== false) {
-    return res.status(400).json({ message: "Transaction status is required." });
-  }
-
-  try {
-    const transaction = await Transaction.findByIdAndUpdate(
   // then the updated information from the body
   const { status, recipientReference, customerReference, amount, customerId, swiftCode} = req.body;
 
@@ -130,24 +98,35 @@ const updateStatus = async (req, res) => {
       { status, recipientReference, customerReference, amount, customerId, swiftCode},
       { new: true }
     );
-
-    if (!transaction) return res.status(404).json({ message: "Transaction not found." });
-
-    res.status(202).json(transaction);
+    // spit it out encoded in json
+    res.status(202).json(updatedTransaction);
   } catch (error) {
+    // if things go south, spit out the error message
     res.status(500).json({ error: error.message });
   }
 };
 
-// DELETE transaction (employees only)
+// DELETE: remove a transaction from existence
 const deleteTransaction = async (req, res) => {
+  // get the id of the transaction we want to remove
   const id = req.params.id;
-  if (!id) return res.status(400).json({ message: "Transaction ID is required." });
 
+  // null check
+  if (!id) {
+    res.status(400).json({ message: "Please provide an ID to delete." });
+  }
+
+  // first try find the transaction
   try {
-    const transaction = await Transaction.findByIdAndDelete(id);
-    if (!transaction) return res.status(404).json({ message: "Transaction not found." });
+    var transaction = await Transaction.findById(id);
 
+    // if no transaction, 404 and exit the method
+    if (!transaction) {
+      res.status(404).json({ message: "No transaction found that matches that ID." });
+    }
+
+    // find the transaction, delete it, and return what it was
+    transaction = await Transaction.findByIdAndDelete(id);
     res.status(202).json(transaction);
   } catch (error) {
     res.status(500).json({ error: error.message });
