@@ -8,9 +8,9 @@ const {
   deleteBank
 } = require('../controllers/bankController.js');
 
-const validateRequest = require('../middleware/validateRequest');
+const validateRequest = require('../middlewares/validateRequest');
 const bankSchemas = require('../schemas/bankSchemas.js');
-const { verifyToken } = require('../middleware/authMiddleware.js');
+const { verifyToken } = require('../middlewares/authMiddleware.js');
 
 const router = express.Router();
 

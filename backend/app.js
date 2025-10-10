@@ -1,16 +1,22 @@
 // server/app.js
-const express = require('express');
-require('dotenv').config();
-const helmet = require('helmet');
-const morgan = require('morgan');
-const rateLimit = require('express-rate-limit');
-const sanitize = require('mongo-sanitize');
+const express = require("express");
+require("dotenv").config();
+const helmet = require("helmet");
+const morgan = require("morgan");
+const rateLimit = require("express-rate-limit");
+const sanitize = require("mongo-sanitize");
+const fs = require("fs");
+const https = require("https");
 
 // import routes
-const authRoute = require('./routes/authRoute.js');
-const bankRoute = require('./routes/bankRoute.js');
-const customerRoute = require('./routes/customerRoute.js');
-const transactionRoute = require('./routes/transactionRoute.js');
+const authRoute = require("./routes/authRoute.js");
+const bankRoute = require("./routes/bankRoute.js");
+const customerRoute = require("./routes/customerRoute.js");
+const transactionRoute = require("./routes/transactionRoute.js");
+
+//Input Sanitization imports
+// const mongoSanitize = require('express-mongo-sanitize')
+//const xss = require('xss-clean')
 
 // initialize express
 const app = express();
@@ -20,8 +26,7 @@ const app = express();
 // Parse JSON safely with 20kb limit
 app.use(express.json({ limit: '20kb' }));
 
-
-// Security headers via Helmet
+// Basic security headers (X-Frame, CSP, XSS filters, etc.)
 app.use(
   helmet({
     contentSecurityPolicy:
@@ -59,7 +64,18 @@ if (process.env.NODE_ENV === 'production') {
     }
     next();
   });
-}
+} 
+// set up our security middleware
+securityMiddlewares(app);
+
+// log every request
+// the logger will look at the request, generate a response, then handle the next incoming request
+app.use((req, res, next) => {
+    // print out to the console (terminal) what type of method was used and to what endpoint that request was made
+    console.log(`${req.method} ${req.url}`)
+    // prepare to handle the next incoming request
+    next();
+  });
 
 app.use((req, res, next) => {
   if (req.body) req.body = sanitize(req.body);
@@ -87,15 +103,28 @@ app.use(
 );
 
 // ---------- Routes ----------
-app.use('/v1/auth', authRoute);
-app.use('/v1/bank', bankRoute);
-app.use('/v1/customer', customerRoute);
-app.use('/v1/transaction', transactionRoute);
+app.use("/v1/auth", authRoute);
+app.use("/v1/bank", bankRoute);
+app.use("/v1/customer", customerRoute);
+app.use("/v1/transaction", transactionRoute);
 
 // ---------- Error Handling ----------
 app.use((err, req, res, next) => {
-  console.error('Unhandled Error:', err);
-  res.status(500).json({ error: 'Internal server error' });
+  console.error("Unhandled Error:", err);
+  res.status(500).json({ error: "Internal server error" });
 });
 
-module.exports = app;
+// ---------- Start Server ----------
+const port = process.env.API_PORT || 3000;
+
+const options = {
+  key: fs.readFileSync("./certs/localhost+1-key.pem"),
+  cert: fs.readFileSync("./certs/localhost+1.pem"),
+};
+
+connectToMongo();
+
+https.createServer(options, app).listen(port, () => {
+  console.log(`✅ Secure API running on https://localhost:${port}`);
+});
+

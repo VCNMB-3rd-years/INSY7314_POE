@@ -7,7 +7,7 @@ const {
   deleteTransaction
 } = require('../controllers/transactionController.js');
 
-const validateRequest = require('../middleware/validateRequest');
+const validateRequest = require('../middlewares/validateRequest');
 const txSchemas = require('../schemas/transactionSchemas.js');
 const { verifyToken, authorizeRole, } = require('../middleware/authMiddleware.js');
 

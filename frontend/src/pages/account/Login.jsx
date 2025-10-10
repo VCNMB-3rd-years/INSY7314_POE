@@ -1,78 +1,63 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { login as apiLogin } from "../../services/apiService";
 import "./Login.css";
 
-const Login = () => {
+export default function Login() {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
-  const [password, setPassword] = useState("");
+  const { login } = useAuth();
+  const [customerData, setCustomerData] = useState({
+    userType: "customer",
+    username: "",
+    accountNumber: "",
+    password: "",
+  });
   const [error, setError] = useState("");
 
-  // Temporary users for testing
-  const mockUsers = [
-    {
-      username: "customer1",
-      accountNumber: "10001",
-      password: "1234",
-      type: "customer",
-    },
-    {
-      username: "employee1",
-      accountNumber: "20001",
-      password: "1234",
-      type: "employee",
-    },
-  ];
+  const handleChange = (e) => {
+    setCustomerData({ ...customerData, [e.target.name]: e.target.value });
+  };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-
-    // Replace this with real backend call later
-    const user = mockUsers.find(
-      (u) =>
-        u.username === username &&
-        u.accountNumber === accountNumber &&
-        u.password === password
-    );
-
-    if (!user) {
-      setError("Invalid username, account number, or password");
-      return;
+    try {
+      const res = await apiLogin(customerData);
+      login(res.data.token); // Pass JWT token to AuthContext
+      navigate("/custDashboard");
+    } catch (err) {
+      setError("Login failed. Please check your credentials.");
+      console.error(err);
     }
-
-    // Redirect based on user type
-    if (user.type === "customer") navigate("/custDashboard");
-    else if (user.type === "employee") navigate("/empDashboard");
   };
 
   return (
-    <div
-      className="login-flex-wrapper"
-      style={{ minHeight: "100vh", overflow: "hidden" }}
-    >
+    <div className="login-flex-wrapper" style={{ minHeight: "100vh" }}>
       <div className="login-form-container">
         <h1>Login</h1>
         <form className="login-form" onSubmit={handleLogin}>
           <input
             type="text"
+            name="username"
             placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={customerData.username}
+            onChange={handleChange}
             required
           />
           <input
             type="text"
+            name="accountNumber"
             placeholder="Account Number"
-            value={accountNumber}
-            onChange={(e) => setAccountNumber(e.target.value)}
+            value={customerData.accountNumber}
+            onChange={handleChange}
             required
           />
           <input
             type="password"
+            name="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={customerData.password}
+            onChange={handleChange}
             required
           />
           {error && <p style={{ color: "#e74c3c" }}>{error}</p>}
@@ -84,6 +69,4 @@ const Login = () => {
       </div>
     </div>
   );
-};
-
-export default Login;
+}
