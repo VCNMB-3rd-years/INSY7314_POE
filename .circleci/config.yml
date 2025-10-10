@@ -112,18 +112,17 @@ jobs:
               echo "No start script found, skipping..."
             fi
   sonarqube:
-    working_directory: ~/build
     docker:
-      - image: sonarsource/sonar-scanner-cli
+      - image: cimg/node:18.16
+    working_directory: ~/build
     resource_class: small
     steps:
+      - checkout
       - attach_workspace:
           at: ~/workspace
       - run:
-          name: Install find command
-          command: |
-            apt-get update
-            apt-get install -y findutils
+          name: Install Sonar Scanner
+          command: npm install -g sonar-scanner
       - run:
           name: Run SonarQube analysis
           command: |
@@ -138,8 +137,6 @@ jobs:
               -Dsonar.login="$SONAR_TOKEN" \
               -Dsonar.branch.name="$SONAR_BRANCH" \
               -Dsonar.sources="."
-
-
 
 workflows:
   version: 2
