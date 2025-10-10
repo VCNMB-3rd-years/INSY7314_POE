@@ -14,8 +14,8 @@ const customerRoute = require('./routes/customerRoute.js');
 const transactionRoute = require('./routes/transactionRoute.js');
 
 //Input Sanitization imports
-const mongoSanitize = require('express-mongo-sanitize')
-const xss = require('xss-clean')
+// const mongoSanitize = require('express-mongo-sanitize')
+//const xss = require('xss-clean')
 
 // initialize express
 const app = express();
@@ -25,13 +25,13 @@ const app = express();
 // Parse JSON safely with 20kb limit
 app.use(express.json({ limit: '20kb' }));
 // calling in express.json middleware, so that our app can handle json
-app.use(express.json());
+//app.use(express.json());
 
 //Prevents  NoSQL query injection
-app.use(mongoSanitize())
+//app.use(mongoSanitize())
 
 //Prevents site script xss
-app.use(xss())
+//app.use(xss())
 
 // Basic security headers (X-Frame, CSP, XSS filters, etc.)
 app.use(
