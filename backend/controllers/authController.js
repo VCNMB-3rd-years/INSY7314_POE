@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const Customer = require("../models/customerModel.js");
 const Employee = require("../models/employeeModel.js");
-const { invalidateToken } = require("../middleware/authMiddleware.js");
+const { invalidateToken } = require("../middlewares/authMiddleware.js");
 require("dotenv").config();
 
 // Helper: generate JWT with username and userType
@@ -15,43 +15,82 @@ const generateJwt = (username, userType) => {
 
 // POST: Register endpoint
 const register = async (req, res) => {
-  const { userType, username, password, ...rest } = req.body;
+  const { userType, username, accountNumber, password, lastName, firstName, nationalId } = req.body;
 
   console.log("Register request body:", req.body);
 
   try {
-    const UserModel = userType === "employee" ? Employee : Customer;
+    if (!userType || !username || !accountNumber || !password || !lastName || !firstName || !nationalId) {
+      return res.status(400).json({
+        message: "Missing required fields. Please ensure all fields are provided: Username, Account Number, Password, Last name, First name, National Id.",
+      });
+    }
 
-    // Check if user exists
+    const UserModel = userType === "customer" ? Customer : Employee;
+
+    // Check if username exists
     const exists = await UserModel.findOne({ username });
-    if (exists) return res.status(400).json({ message: "Username already exists." });
+    if (exists) {
+      console.warn(`⚠️ Username '${username}' already exists for ${userType}.`);
+      return res.status(400).json({
+        message: `The username '${username}' is already taken. Please choose a different one.`,
+      });
+    }
 
     // Validate password
     if (!password || password.length < 8) {
-      return res.status(400).json({ message: "Password must be at least 8 characters." });
+      console.warn("⚠️ Weak password detected.");
+      return res.status(400).json({
+        message: "Password must be at least 8 characters long.",
+      });
     }
 
-    // Create user; password will be hashed automatically by model's pre-save hook
-    const user = await UserModel.create({ username, password, ...rest });
+    // Validate account number format
+    if (isNaN(accountNumber)) {
+      console.warn("⚠️ Invalid account number format.");
+      return res.status(400).json({
+        message: "Account number must be numeric.",
+      });
+    }
+
+    // Create user
+    const user = await UserModel.create({
+      userType,
+      username,
+      password,
+      accountNumber,
+      lastName,
+      firstName,
+      nationalId,
+    });
+
+    console.log(`✅ ${userType} registered successfully: ${username}`);
 
     // Generate JWT
     const token = generateJwt(username, userType);
 
-    res.status(200).json({ message: `${userType} registered successfully`, token });
+    res.status(201).json({
+      message: `${userType} : '${username}' registered successfully.`,
+      token,
+    });
   } catch (err) {
-    console.error("Register error:", err);
-    res.status(500).json({ error: err.message });
+    console.error(" Register error:", err);
+    res.status(500).json({
+      message: "An unexpected error occurred while registering the user.",
+      details: err.message,
+      hint: "Check your MongoDB connection and model validation rules.",
+    });
   }
 };
 
 // POST: Login endpoint
 const login = async (req, res) => {
-  const { userType, username, password } = req.body;
+  const { userType, username, accountNumber, password } = req.body;
 
   console.log("Login request body:", req.body);
 
   try {
-    const UserModel = userType === "employee" ? Employee : Customer;
+    const UserModel = userType === "customer" ? Customer : Employee;
 
     // Find user
     const user = await UserModel.findOne({ username });

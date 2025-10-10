@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const { connectToMongo } = require('./services/dbService.js');
+const { securityMiddlewares } = require('./middlewares/securityMiddleware.js');
 
 // import routes
 const authRoute = require('./routes/authRoute.js');
@@ -33,7 +34,47 @@ app.use(mongoSanitize())
 app.use(xss())
 
 // Basic security headers (X-Frame, CSP, XSS filters, etc.)
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy:
+      process.env.NODE_ENV === "production"
+        ? {
+            directives: {
+              defaultSrc: ["'self'"],
+              scriptSrc: ["'self'"],
+              styleSrc: ["'self'", "'unsafe-inline'"], // allow inline styles if needed
+              imgSrc: ["'self'"],
+              connectSrc: ["'self'"], // restrict API/WebSocket connections
+              objectSrc: ["'none'"],
+              upgradeInsecureRequests: [],
+            },
+          }
+        : false, // 🔓 disables CSP when running locally with Vite dev server
+    crossOriginEmbedderPolicy: false, // prevents CORS issues with Vite
+  })
+);
+
+// Force HTTPS in production (redirect HTTP → HTTPS)
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.headers['x-forwarded-proto'] !== 'https') {
+      // Redirect to HTTPS
+      return res.redirect(`https://${req.headers.host}${req.url}`);
+    }
+    next();
+  });
+} 
+// set up our security middleware
+securityMiddlewares(app);
+
+// log every request
+// the logger will look at the request, generate a response, then handle the next incoming request
+app.use((req, res, next) => {
+    // print out to the console (terminal) what type of method was used and to what endpoint that request was made
+    console.log(`${req.method} ${req.url}`)
+    // prepare to handle the next incoming request
+    next();
+  });
 
 // Logger: shows request info in dev
 app.use(morgan('dev'));
@@ -66,3 +107,4 @@ connectToMongo();
 app.listen(port, () => {
   console.log(`✅ Secure API listening on port ${port}`);
 });
+

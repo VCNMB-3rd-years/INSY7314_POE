@@ -1,78 +1,75 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import "./Login.css";
+import { login } from "../../services/apiService";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
-  const [password, setPassword] = useState("");
+  const [customerData, setCustomerData] = useState({
+    userType: "customer",
+    username: "",
+    accountNumber: "",
+    password: "",
+  });
   const [error, setError] = useState("");
 
-  // Temporary users for testing
-  const mockUsers = [
-    {
-      username: "customer1",
-      accountNumber: "10001",
-      password: "1234",
-      type: "customer",
-    },
-    {
-      username: "employee1",
-      accountNumber: "20001",
-      password: "1234",
-      type: "employee",
-    },
-  ];
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-
-    // Replace this with real backend call later
-    const user = mockUsers.find(
-      (u) =>
-        u.username === username &&
-        u.accountNumber === accountNumber &&
-        u.password === password
-    );
-
-    if (!user) {
-      setError("Invalid username, account number, or password");
-      return;
-    }
-
-    // Redirect based on user type
-    if (user.type === "customer") navigate("/custDashboard");
-    else if (user.type === "employee") navigate("/empDashboard");
+  const handleChange = (e) => {
+    setCustomerData({ ...customerData, [e.target.name]: e.target.value });
   };
 
+const handleLogin = async (e) => {
+  e.preventDefault();
+  setError("");
+
+  try {
+    const requestBody = {
+      ...customerData,
+      userType: "customer", // or "employee"
+      accountNumber: Number(customerData.accountNumber)
+    };
+
+    const response = await login(requestBody);
+
+    // Successful login
+    console.log(response.data);
+    navigate("/custDashboard");
+  } catch (err) {
+    if (err.response) {
+      setError(err.response.data.message || "Invalid credentials");
+    } else {
+      setError("Server error: " + err.message);
+    }
+  }
+};
+
+
   return (
-    <div
-      className="login-flex-wrapper"
-      style={{ minHeight: "100vh", overflow: "hidden" }}
-    >
+    <div className="login-flex-wrapper" style={{ minHeight: "100vh", overflow: "hidden" }}>
       <div className="login-form-container">
         <h1>Login</h1>
         <form className="login-form" onSubmit={handleLogin}>
           <input
             type="text"
+            name="username"
             placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={customerData.username}
+            onChange={handleChange}
             required
           />
           <input
             type="text"
+            name="accountNumber"
             placeholder="Account Number"
-            value={accountNumber}
-            onChange={(e) => setAccountNumber(e.target.value)}
+            value={customerData.accountNumber}
+            onChange={handleChange}
             required
           />
           <input
             type="password"
+            name="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={customerData.password}
+            onChange={handleChange}
             required
           />
           {error && <p style={{ color: "#e74c3c" }}>{error}</p>}

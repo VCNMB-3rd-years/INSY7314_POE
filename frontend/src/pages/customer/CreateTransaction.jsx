@@ -1,8 +1,42 @@
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppSidebar from "../../components/AppSidebar";
+import { createTransaction } from "../../services/apiService";
 
 export default function CreateTransaction() {
   const navigate = useNavigate();
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState(""); // "success" or "error"
+
+  const [transactionData, setTransactionData] = useState({
+    status: "",
+    recipientReference: "",
+    customerReference: "",
+    amount: "",
+    customerBankId: "",
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await createTransaction(transactionData);
+      setMessage("Transaction created successfully!");
+      setMessageType("success");
+
+      // reset form
+      setTransactionData({
+        status: "",
+        recipientReference: "",
+        customerReference: "",
+        amount: "",
+        customerBankId: "",
+      });
+    } catch (err) {
+      setMessage("Failed to create transaction.");
+      setMessageType("error");
+    }
+  };
+
   const backToDash = () => {
     navigate("/custDashboard");
   };
@@ -40,15 +74,26 @@ export default function CreateTransaction() {
           <h1 style={{ fontSize: "1.8rem", marginBottom: "0.5rem" }}>
             Create Transaction
           </h1>
-          <p
-            style={{ color: "#bbb", marginBottom: "2rem", fontSize: "0.95rem" }}
-          >
-            Fill in the details below to send money securely and instantly to
-            another account.
-          </p>
 
-          {/* Form */}
+          {/* ✅ Success / Error Message */}
+          {message && (
+            <div
+              style={{
+                background:
+                  messageType === "success" ? "#2e7d32" : "#c62828",
+                color: "white",
+                padding: "0.75rem",
+                borderRadius: "0.5rem",
+                marginBottom: "1rem",
+                textAlign: "center",
+              }}
+            >
+              {message}
+            </div>
+          )}
+
           <form
+            onSubmit={handleSubmit}
             style={{
               display: "flex",
               flexDirection: "column",
@@ -56,18 +101,35 @@ export default function CreateTransaction() {
             }}
           >
             <input
-              type="text"
-              placeholder="Recipient Account"
-              required
-              style={inputStyle}
-            />
-            <input
               type="number"
               placeholder="Amount"
               required
               style={inputStyle}
+              value={transactionData.amount}
+              onChange={(e) =>
+                setTransactionData({ ...transactionData, amount: e.target.value })
+              }
             />
-            <input type="text" placeholder="Reference" style={inputStyle} />
+
+            <input
+              type="text"
+              placeholder="Customer Reference"
+              style={inputStyle}
+              value={transactionData.customerReference}
+              onChange={(e) =>
+                setTransactionData({ ...transactionData, customerReference: e.target.value })
+              }
+            />
+            <input
+              type="text"
+              placeholder="Recipient Reference"
+              required
+              style={inputStyle}
+              value={transactionData.recipientReference}
+              onChange={(e) =>
+                setTransactionData({ ...transactionData, recipientReference: e.target.value })
+              }
+            />
 
             <button type="submit" style={buttonPrimaryStyle}>
               Send Transaction

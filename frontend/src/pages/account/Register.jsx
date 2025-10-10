@@ -1,95 +1,107 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import "./Register.css";
+import { register } from "../../services/apiService";
 
 const Register = () => {
   const navigate = useNavigate();
-  const [fullName, setFullName] = useState("");
-  const [idNumber, setIdNumber] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
-  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState(""); // "success" or "error"
+
+  const [customerData, setCustomerData] = useState({
+    userType: "customer",
+    firstName: "",
+    lastName: "",
+    nationalId: "",
+    accountNumber: "",
+    username: "",
+    password: "",
+  });
   const [error, setError] = useState("");
 
-  // Temporary users for testing
-  const mockUsers = [
-    {
-      fullName: "John Doe",
-      idNumber: "1234567890",
-      accountNumber: "10001",
-      password: "1234",
-      type: "customer",
-    },
-    {
-      fullName: "Jane Smith",
-      idNumber: "9876543210",
-      accountNumber: "20001",
-      password: "1234",
-      type: "employee",
-    },
-  ];
+  const handleRegister = async (e) => {
+  e.preventDefault();
+  setError("");
+  setMessage("");
 
-  const handleRegister = (e) => {
-    e.preventDefault();
+  try {
+    const requestBody = { ...customerData, userType: "customer" }; 
+    const response = await register(requestBody);
 
-    // Replace this with real backend call later
-    const user = mockUsers.find(
-      (u) =>
-        u.fullName === fullName &&
-        u.idNumber === idNumber &&
-        u.accountNumber === accountNumber &&
-        u.password === password
-    );
+    setMessage(response.data.message);
+    setMessageType("success");
 
-    if (!user) {
-      setError("Invalid registration details");
-      return;
-    }
+    // Redirect after successful registration
+    setTimeout(() => navigate("/login"), 1500);
+  } catch (error) {
+    const serverMessage = error.response?.data?.message || error.message;
+    setMessage(`Server error: ${serverMessage}`);
+    setMessageType("error");
+  }
+};
 
-    // Redirect based on user type
-    if (user.type === "customer") navigate("/custDashboard");
-    else if (user.type === "employee") navigate("/empDashboard");
+  const handleChange = (e) => {
+    setCustomerData({ ...customerData, [e.target.name]: e.target.value });
   };
 
   return (
-    <div
-      className="register-flex-wrapper"
-      style={{ minHeight: "100vh", overflow: "hidden" }}
-    >
+    <div className="register-flex-wrapper" style={{ minHeight: "100vh", overflow: "hidden" }}>
       <div className="register-form-container">
         <h1>Register</h1>
         <form className="register-form" onSubmit={handleRegister}>
           <input
             type="text"
-            placeholder="Full Name"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            name="firstName"
+            placeholder="First Name"
+            value={customerData.firstName}
+            onChange={handleChange}
             required
           />
           <input
             type="text"
+            name="lastName"
+            placeholder="Last Name"
+            value={customerData.lastName}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            name="nationalId"
             placeholder="ID Number"
-            value={idNumber}
-            onChange={(e) => setIdNumber(e.target.value)}
+            value={customerData.nationalId}
+            onChange={handleChange}
             required
           />
           <input
             type="text"
+            name="accountNumber"
             placeholder="Account Number"
-            value={accountNumber}
-            onChange={(e) => setAccountNumber(e.target.value)}
+            value={customerData.accountNumber}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={customerData.username}
+            onChange={handleChange}
             required
           />
           <input
             type="password"
+            name="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={customerData.password}
+            onChange={handleChange}
             required
           />
-          {error && <p>{error}</p>}
+          {error && <p style={{ color: "red" }}>{error}</p>}
           <button type="submit">Register</button>
         </form>
       </div>
+      
       <div className="register-image-container">
         <img src="/phone.jpg" alt="Coinnect Logo" />
       </div>
