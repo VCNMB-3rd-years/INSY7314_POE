@@ -4,14 +4,15 @@ const Employee = require("../models/employeeModel.js");
 const { invalidateToken } = require("../middlewares/authMiddleware.js");
 require("dotenv").config();
 
-// Helper: generate JWT with username and userType
-const generateJwt = (username, userType) => {
+// Helper: generate JWT with username, userType, and customerId
+const generateJwt = (username, userType, customerId) => {
   if (!process.env.JWT_SECRET) {
     console.error("JWT_SECRET not found in .env");
     throw new Error("JWT_SECRET not defined");
   }
-  return jwt.sign({ username, userType }, process.env.JWT_SECRET, { expiresIn: "1h" });
+  return jwt.sign({ username, userType, customerId }, process.env.JWT_SECRET, { expiresIn: "1h" });
 };
+
 
 // POST: Register endpoint
 const register = async (req, res) => {
@@ -67,7 +68,7 @@ const register = async (req, res) => {
     console.log(`✅ ${userType} registered successfully: ${username}`);
 
     // Generate JWT
-    const token = generateJwt(username, userType);
+    const token = generateJwt(username, userType, user._id);
 
     res.status(201).json({
       message: `${userType} : '${username}' registered successfully.`,
@@ -85,7 +86,7 @@ const register = async (req, res) => {
 
 // POST: Login endpoint
 const login = async (req, res) => {
-  const { userType, username, accountNumber, password } = req.body;
+  const { userType, username, accountNumber, password } = req.body;;
 
   console.log("Login request body:", req.body);
 
@@ -103,7 +104,12 @@ const login = async (req, res) => {
     if (!matching) return res.status(400).json({ message: "Invalid credentials." });
 
     // Generate JWT
-    const token = generateJwt(username, userType);
+    const token = jwt.sign(
+      { username, userType, customerId: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
     res.status(200).json({ message: `${userType} logged in successfully`, token });
   } catch (err) {
     console.error("Login error:", err);

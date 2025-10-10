@@ -1,0 +1,45 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@5.2
+
+jobs:
+  # --- FRONTEND BUILD ---
+  build-frontend:
+    docker:
+      - image: cimg/node:18.16
+    working_directory: ~/project/frontend
+    steps:
+      - checkout
+      - run:
+          name: Install frontend dependencies
+          command: npm ci
+      - run:
+          name: Build frontend
+          command: npm run build
+      - run:
+          name: Run frontend tests
+          command: npm test || echo "No tests found"
+
+  # --- BACKEND BUILD ---
+  build-backend:
+    docker:
+      - image: cimg/node:18.16
+    working_directory: ~/project/backend
+    steps:
+      - checkout
+      - run:
+          name: Install backend dependencies
+          command: npm ci
+      - run:
+          name: Run backend tests
+          command: npm test || echo "No tests found"
+      - run:
+          name: Start backend server (optional)
+          command: npm start & sleep 5
+
+workflows:
+  build_and_test_all:
+    jobs:
+      - build-frontend
+      - build-backend

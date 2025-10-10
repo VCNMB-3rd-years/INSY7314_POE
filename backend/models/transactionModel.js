@@ -1,17 +1,22 @@
+// server/models/transactionModel.js
 const mongoose = require('mongoose');
+const crypto = require('crypto');
 
 const TransactionSchema = new mongoose.Schema({
   transactionId: { type: String, default: () => crypto.randomUUID() },
-  status: {type: Boolean, default: false},
-  recipientReference: String,
-  customerReference: String,
-  amount: Number,
-  //fk
-  customerId: [{ type: String,ref: "customerModel" }]
+  status: { type: Boolean, required: true },
+  // link to customer by customerId (from Customer model)
+  customerId: { type: String, ref: "Customer", required: true },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
 });
-// we then define that the object references that schema, and give it a name
+
+// Auto-update updatedAt on save
+TransactionSchema.pre('save', function (next) {
+  this.updatedAt = Date.now();
+  next();
+});
+
 const Transaction = mongoose.model('Transaction', TransactionSchema);
 
-// finally we export our object, so that we can reference it in other files
-// we will use our object in the controllers, so that we can interface with the database
 module.exports = Transaction;

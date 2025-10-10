@@ -1,4 +1,3 @@
-// server/routes/transactions.js
 const express = require('express');
 const {
   getTransaction,
@@ -10,22 +9,41 @@ const {
 
 const validateRequest = require('../middlewares/validateRequest');
 const txSchemas = require('../schemas/transactionSchemas.js');
+const { verifyToken, authorizeRole, } = require('../middlewares/authMiddleware.js');
 
 const router = express.Router();
 
-// GET /api/transactions/getTransactions
-router.get('/getTransactions', getTransactions);
+// GET all transactions — customer sees own, employee sees all
+router.get('/getTransactions', verifyToken, getTransactions);
 
-// GET /api/transactions/:id
-router.get('/:id', validateRequest(txSchemas.getTransaction), getTransaction);
+// GET a transaction by ID — only owner (customer) or employee
+router.get('/:id', verifyToken, validateRequest(txSchemas.getTransaction), getTransaction);
 
-// POST /api/transactions/createTransaction
-router.post('/createTransaction', validateRequest(txSchemas.createTransaction), createTransaction);
+// POST create transaction — customers only
+router.post(
+  '/createTransaction',
+  verifyToken,
+  authorizeRole(['customer']),
+  validateRequest(txSchemas.createTransaction),
+  createTransaction
+);
 
-// PUT /api/transactions/:id
-router.put('/:id', validateRequest(txSchemas.updateStatus), updateStatus);
+// PUT update status — employees only
+router.put(
+  '/:id',
+  verifyToken,
+  authorizeRole(['employee']),
+  validateRequest(txSchemas.updateStatus),
+  updateStatus
+);
 
-// DELETE /api/transactions/:id
-router.delete('/:id', validateRequest(txSchemas.getTransaction), deleteTransaction);
+// DELETE transaction — employees only
+router.delete(
+  '/:id',
+  verifyToken,
+  authorizeRole(['employee']),
+  validateRequest(txSchemas.getTransaction),
+  deleteTransaction
+);
 
 module.exports = router;

@@ -1,10 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { login as apiLogin } from "../../services/apiService";
 import "./Login.css";
-import { login } from "../../services/apiService";
 
-const Login = () => {
+export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [customerData, setCustomerData] = useState({
     userType: "customer",
     username: "",
@@ -17,34 +19,20 @@ const Login = () => {
     setCustomerData({ ...customerData, [e.target.name]: e.target.value });
   };
 
-const handleLogin = async (e) => {
-  e.preventDefault();
-  setError("");
-
-  try {
-    const requestBody = {
-      ...customerData,
-      userType: "customer", // or "employee"
-      accountNumber: Number(customerData.accountNumber)
-    };
-
-    const response = await login(requestBody);
-
-    // Successful login
-    console.log(response.data);
-    navigate("/custDashboard");
-  } catch (err) {
-    if (err.response) {
-      setError(err.response.data.message || "Invalid credentials");
-    } else {
-      setError("Server error: " + err.message);
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await apiLogin(customerData);
+      login(res.data.token); // Pass JWT token to AuthContext
+      navigate("/custDashboard");
+    } catch (err) {
+      setError("Login failed. Please check your credentials.");
+      console.error(err);
     }
-  }
-};
-
+  };
 
   return (
-    <div className="login-flex-wrapper" style={{ minHeight: "100vh", overflow: "hidden" }}>
+    <div className="login-flex-wrapper" style={{ minHeight: "100vh" }}>
       <div className="login-form-container">
         <h1>Login</h1>
         <form className="login-form" onSubmit={handleLogin}>
@@ -81,6 +69,4 @@ const handleLogin = async (e) => {
       </div>
     </div>
   );
-};
-
-export default Login;
+}

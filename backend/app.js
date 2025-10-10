@@ -1,17 +1,24 @@
 // server/app.js
-const express = require('express');
-require('dotenv').config();
-const helmet = require('helmet');
-const morgan = require('morgan');
-const rateLimit = require('express-rate-limit');
-const { connectToMongo } = require('./services/dbService.js');
-const { securityMiddlewares } = require('./middlewares/securityMiddleware.js');
+const express = require("express");
+require("dotenv").config();
+const helmet = require("helmet");
+const morgan = require("morgan");
+const rateLimit = require("express-rate-limit");
+const sanitize = require("mongo-sanitize");
+const fs = require("fs");
+const https = require("https");
+const securityMiddlewares = require('./middlewares/securityMiddleware.js');
+
 
 // import routes
-const authRoute = require('./routes/authRoute.js');
-const bankRoute = require('./routes/bankRoute.js');
-const customerRoute = require('./routes/customerRoute.js');
-const transactionRoute = require('./routes/transactionRoute.js');
+const authRoute = require("./routes/authRoute.js");
+const bankRoute = require("./routes/bankRoute.js");
+const customerRoute = require("./routes/customerRoute.js");
+const transactionRoute = require("./routes/transactionRoute.js");
+
+//Input Sanitization imports
+// const mongoSanitize = require('express-mongo-sanitize')
+//const xss = require('xss-clean')
 
 // initialize express
 const app = express();
@@ -30,15 +37,24 @@ app.use(
             directives: {
               defaultSrc: ["'self'"],
               scriptSrc: ["'self'"],
-              styleSrc: ["'self'", "'unsafe-inline'"], // allow inline styles if needed
+              styleSrc: ["'self'", "'unsafe-inline'"],
               imgSrc: ["'self'"],
-              connectSrc: ["'self'"], // restrict API/WebSocket connections
+              connectSrc: ["'self'"],
               objectSrc: ["'none'"],
               upgradeInsecureRequests: [],
             },
           }
-        : false, // 🔓 disables CSP when running locally with Vite dev server
-    crossOriginEmbedderPolicy: false, // prevents CORS issues with Vite
+        : false, // disables CSP in dev for Vite
+    crossOriginEmbedderPolicy: false, // avoids CORS issues with Vite dev
+  })
+);
+
+// HSTS (HTTP Strict Transport Security) for 1 year
+app.use(
+  helmet.hsts({
+    maxAge: 31536000, // 1 year in seconds
+    includeSubDomains: true,
+    preload: true,
   })
 );
 
@@ -46,7 +62,6 @@ app.use(
 if (process.env.NODE_ENV === 'production') {
   app.use((req, res, next) => {
     if (req.headers['x-forwarded-proto'] !== 'https') {
-      // Redirect to HTTPS
       return res.redirect(`https://${req.headers.host}${req.url}`);
     }
     next();
@@ -64,35 +79,54 @@ app.use((req, res, next) => {
     next();
   });
 
-// Logger: shows request info in dev
+app.use((req, res, next) => {
+  if (req.body) req.body = sanitize(req.body);
+  if (req.params) req.params = sanitize(req.params);
+  next();
+});
+
+// 🔒 Global no-cache policy (best default for financial & auth APIs)
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
+
+// Logger for development
 app.use(morgan('dev'));
 
-// Basic rate limiter (protects early from brute force)
-app.use(rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP
-  standardHeaders: true,
-  legacyHeaders: false
-}));
+// Basic rate limiter
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit per IP
+    standardHeaders: true,
+    legacyHeaders: false,
+  })
+);
 
 // ---------- Routes ----------
-app.use('/v1/auth', authRoute);
-app.use('/v1/bank', bankRoute);
-app.use('/v1/customer', customerRoute);
-app.use('/v1/transaction', transactionRoute);
+app.use("/v1/auth", authRoute);
+app.use("/v1/bank", bankRoute);
+app.use("/v1/customer", customerRoute);
+app.use("/v1/transaction", transactionRoute);
 
 // ---------- Error Handling ----------
 app.use((err, req, res, next) => {
-  console.error('Unhandled Error:', err);
-  res.status(500).json({ error: 'Internal server error' });
+  console.error("Unhandled Error:", err);
+  res.status(500).json({ error: "Internal server error" });
 });
 
 // ---------- Start Server ----------
 const port = process.env.API_PORT || 3000;
 
-connectToMongo();
+const options = {
+  key: fs.readFileSync("./certs/localhost+1-key.pem"),
+  cert: fs.readFileSync("./certs/localhost+1.pem"),
+};
 
-app.listen(port, () => {
-  console.log(`✅ Secure API listening on port ${port}`);
+module.exports = app;
+
+https.createServer(options, app).listen(port, () => {
+  console.log(`✅ Secure API running on https://localhost:${port}`);
 });
 
