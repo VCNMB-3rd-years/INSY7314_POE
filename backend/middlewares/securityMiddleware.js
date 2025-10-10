@@ -3,12 +3,15 @@ const helmet = require('helmet');
 const cors = require('cors');
 
 const corsOptions = {
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
+  origin: "http://localhost:5173", 
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+  optionsSuccessStatus: 200, // for legacy browsers
 };
 
 function securityMiddlewares(app) {
+    app.use(cors(corsOptions));
     app.use(
         helmet({
             contentSecurityPolicy: {
@@ -30,8 +33,8 @@ function securityMiddlewares(app) {
         })
     );
 
-    app.use(cors(corsOptions));
+    
     console.log("✅ Helmet and CORS security middleware applied.");
 }
 
-module.exports = securityMiddlewares;
+module.exports = {securityMiddlewares};

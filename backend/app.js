@@ -13,7 +13,6 @@ const bankRoute = require('./routes/bankRoute.js');
 const customerRoute = require('./routes/customerRoute.js');
 const transactionRoute = require('./routes/transactionRoute.js');
 
-const securityMiddlewares = require("./middlewares/securityMiddleware.js");
 //Input Sanitization imports
 // const mongoSanitize = require('express-mongo-sanitize')
 //const xss = require('xss-clean')
