@@ -117,10 +117,11 @@ jobs:
       - image: sonarsource/sonar-scanner-cli
     resource_class: small
     steps:
+      - attach_workspace:
+          at: ~/workspace
       - run:
           name: Install find command
-          command: |
-            apk add --no-cache findutils
+          command: apk add --no-cache findutils
       - run: find .
       - attach_workspace:
           at: ~/workspace
