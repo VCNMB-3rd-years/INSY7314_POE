@@ -207,3 +207,35 @@ cd coinnect
 - **HTTPS** → Encrypted communication  
 - **Rate Limiter** → Protects against brute-force attacks  
 - **JWT** → Secure authentication layer
+  
+---
+
+# Reference list
+
+Ali, H., 2024. How to Defend Against Server-Side Request Forgery. [online] freeCodeCamp.org. Available at: <https://www.freecodecamp.org/news/defending-against-ssrf-attacks/> [Accessed 6 October 2025].
+
+Charity, D.T., 2024. How to Hash Passwords with bcrypt in Node.js. [online] freeCodeCamp.org. Available at: <https://www.freecodecamp.org/news/how-to-hash-passwords-with-bcrypt-in-nodejs/> [Accessed 6 October 2025].
+
+Çoban, A.T., 2024. RBAC (Role-Based Access Control) in Node.js. [online] Medium. Available at: <https://alitalhacoban.medium.com/rbac-role-based-access-control-in-node-js-d8e5a2d5e67c> [Accessed 7 October 2025].
+
+Cybersecurity, T., 2024. What is Cache-Control and How HTTP Cache Headers Work | CDN Guide | Imperva. [online] Learning Center. Available at: <https://www.imperva.com/learn/performance/cache-control/> [Accessed 7 October 2025].
+
+Das, A., 2025. Top 6 Methods for Managing Sessions in Node.js. [online] Medium. Available at: <https://article.arunangshudas.com/top-6-methods-for-managing-sessions-in-node-js-d44615a35ec6> [Accessed 7 October 2025].
+
+Helmet.js, 2025a. GitHub - helmetjs/helmet: Help secure Express apps with various HTTP headers. [online] GitHub. Available at: <https://github.com/helmetjs/helmet> [Accessed 6 October 2025].
+
+Helmet.js, 2025b. Helmet. [online] helmetjs.github.io. Available at: <https://helmetjs.github.io/> [Accessed 6 October 2025].
+
+mdn, 2020. content/files/en-us/learn_web_development/extensions/forms/form_validation/index.md at main · mdn/content. [online] GitHub. Available at: <https://github.com/mdn/content/blob/main/files/en-us/learn_web_development/extensions/forms/form_validation/index.md?plain=1> [Accessed 7 October 2025].
+
+mdn, 2025. Client-side form validation - Learn web development | MDN. [online] Mozilla.org. Available at: <https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Form_validation#validating_forms_using_javascript> [Accessed 7 October 2025].
+
+MeRahulAhire, 2020. httpOnly-cookie-React-Node/server.js at master · MeRahulAhire/httpOnly-cookie-React-Node. [online] GitHub. Available at: <https://github.com/MeRahulAhire/httpOnly-cookie-React-Node/blob/master/server.js> [Accessed 6 October 2025].
+
+npm, 2025. helmet. [online] npm. Available at: <https://www.npmjs.com/package/helmet> [Accessed 6 October 2025].
+
+TechRide with PK, 2025. Implement Security using TLS/SSL Connection. [online] YouTube. Available at: <https://www.youtube.com/watch?v=zvWwCrNVZlI> [Accessed 10 October 2025].
+
+Zanini, A., 2023. Using Helmet in Node.js to secure your application. [online] LogRocket Blog. Available at: <https://blog.logrocket.com/using-helmet-node-js-secure-application/> [Accessed 6 October 2025].
+
+Zanini, A., 2024. How to Implement Rate Limiting in Express for Node.js. [online] Appsignal.com. Available at: <https://blog.appsignal.com/2024/04/03/how-to-implement-rate-limiting-in-express-for-nodejs.html> [Accessed 7 October 2025].
