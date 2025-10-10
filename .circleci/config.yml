@@ -115,7 +115,7 @@ jobs:
   # --- SonarQube analysis ---
   sonarqube:
     docker:
-      - image: cimg/node:18.16
+      - image: sonarsource/sonar-scanner-cli
     working_directory: ~/build
     resource_class: small
     steps:
@@ -123,15 +123,12 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - run:
-          name: Install Sonar Scanner locally
-          command: npm install sonar-scanner
-      - run:
           name: Run SonarQube analysis
           command: |
-            SONAR_BRANCH="${CIRCLE_BRANCH:-master}"
+            SONAR_BRANCH="${CIRCLE_BRANCH:-main}"
             echo "Sonar branch value is: $SONAR_BRANCH"
             echo "Sonar org value is: $SONAR_ORG"
-            npx sonar-scanner \
+            sonar-scanner \
               -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
               -Dsonar.organization="$SONAR_ORG" \
               -Dsonar.host.url=https://sonarcloud.io \
@@ -154,4 +151,3 @@ workflows:
           requires:
             - install-backend-deps
       - sonarqube
-
