@@ -7,6 +7,8 @@ const rateLimit = require("express-rate-limit");
 const sanitize = require("mongo-sanitize");
 const fs = require("fs");
 const https = require("https");
+const securityMiddlewares = require('./middlewares/securityMiddleware.js');
+
 
 // import routes
 const authRoute = require("./routes/authRoute.js");
@@ -122,7 +124,7 @@ const options = {
   cert: fs.readFileSync("./certs/localhost+1.pem"),
 };
 
-connectToMongo();
+module.exports = app;
 
 https.createServer(options, app).listen(port, () => {
   console.log(`✅ Secure API running on https://localhost:${port}`);
