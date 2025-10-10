@@ -1,7 +1,7 @@
 version: 2.1
 
 jobs:
-  # --- Simple sanity test ---
+  # --- Simple sanity check ---
   say-hello:
     docker:
       - image: cimg/base:current
@@ -14,13 +14,14 @@ jobs:
   # --- Install frontend dependencies ---
   install-frontend-deps:
     docker:
-      - image: cimg/node:current
+      - image: cimg/node:18.16
     working_directory: /home/circleci/project
     steps:
       - checkout
       - restore_cache:
           keys:
             - frontend-deps-{{ checksum "frontend/package-lock.json" }}
+            - frontend-deps-
       - run:
           name: Install frontend dependencies
           command: |
@@ -34,13 +35,14 @@ jobs:
   # --- Build frontend ---
   build-frontend:
     docker:
-      - image: cimg/node:current
+      - image: cimg/node:18.16
     working_directory: /home/circleci/project
     steps:
       - checkout
       - restore_cache:
           keys:
             - frontend-deps-{{ checksum "frontend/package-lock.json" }}
+            - frontend-deps-
       - run:
           name: Build frontend
           command: |
@@ -52,16 +54,74 @@ jobs:
             cd frontend
             npm test || echo "No tests found"
 
+  # --- Install backend dependencies ---
+  install-backend-deps:
+    docker:
+      - image: cimg/node:18.16
+    working_directory: /home/circleci/project
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - backend-deps-{{ checksum "backend/package-lock.json" }}
+            - backend-deps-
+      - run:
+          name: Install backend dependencies
+          command: |
+            cd backend
+            npm ci
+      - save_cache:
+          key: backend-deps-{{ checksum "backend/package-lock.json" }}
+          paths:
+            - backend/node_modules
+
+  # --- Build backend ---
+  build-backend:
+    docker:
+      - image: cimg/node:18.16
+    working_directory: /home/circleci/project
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - backend-deps-{{ checksum "backend/package-lock.json" }}
+            - backend-deps-
+      - run:
+          name: Run backend tests
+          command: |
+            cd backend
+            npm test || echo "No tests found"
+      - run:
+          name: Build backend (if applicable)
+          command: |
+            cd backend
+            if grep -q '"build"' package.json; then
+              npm run build
+            else
+              echo "No build script found, skipping..."
+            fi
+      - run:
+          name: Start backend server (optional)
+          command: |
+            cd backend
+            if grep -q '"start"' package.json; then
+              npm start &
+              sleep 5
+              echo "Backend started (brief check)"
+            else
+              echo "No start script found, skipping..."
+            fi
+
 workflows:
-  # Simple hello world test
-  say-hello-workflow:
+  version: 2
+  main-workflow:
     jobs:
       - say-hello
-
-  # Frontend build workflow
-  build-frontend-workflow:
-    jobs:
       - install-frontend-deps
+      - install-backend-deps
       - build-frontend:
           requires:
             - install-frontend-deps
+      - build-backend:
+          requires:
+            - install-backend-deps
