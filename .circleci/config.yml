@@ -9,7 +9,7 @@ jobs:
       - checkout
       - run:
           name: "Say hello"
-          command: "echo Hello, World!"
+          command: echo "Hello, World!"
 
   # --- Install frontend dependencies ---
   install-frontend-deps:
@@ -111,7 +111,9 @@ jobs:
             else
               echo "No start script found, skipping..."
             fi
- sonarqube:
+
+  # --- SonarQube analysis ---
+  sonarqube:
     docker:
       - image: cimg/node:18.16
     working_directory: ~/build
@@ -138,8 +140,6 @@ jobs:
               -Dsonar.branch.name="$SONAR_BRANCH" \
               -Dsonar.sources="."
 
-
-
 workflows:
   version: 2
   main-workflow:
@@ -147,10 +147,11 @@ workflows:
       - say-hello
       - install-frontend-deps
       - install-backend-deps
-      - sonarqube
       - build-frontend:
           requires:
             - install-frontend-deps
       - build-backend:
           requires:
             - install-backend-deps
+      - sonarqube
+
