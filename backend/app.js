@@ -48,6 +48,12 @@ const xss = require('xss-clean');
 app.use(mongoSanitize());
 app.use(xss());
 
+// 🔒 Global no-cache policy (best default for financial & auth APIs)
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
+
 // HSTS (HTTP Strict Transport Security) for 1 year
 app.use(
   helmet.hsts({
