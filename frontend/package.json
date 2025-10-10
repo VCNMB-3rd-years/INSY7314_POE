@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@heroui/react": "^2.8.4",
+    "aos": "^2.3.4",
+    "axios": "^1.12.2",
     "lucide-react": "^0.544.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

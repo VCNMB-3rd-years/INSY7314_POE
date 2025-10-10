@@ -10,23 +10,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  // Temporary users for testing
-  const mockUsers = [
-    {
-      fullName: "John Doe",
-      idNumber: "1234567890",
-      accountNumber: "10001",
-      password: "1234",
-      type: "customer",
-    },
-    {
-      fullName: "Jane Smith",
-      idNumber: "9876543210",
-      accountNumber: "20001",
-      password: "1234",
-      type: "employee",
-    },
-  ];
+
 
   const handleRegister = (e) => {
     e.preventDefault();

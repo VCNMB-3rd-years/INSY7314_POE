@@ -1,14 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./BankNavbar.css";
 
 const BankNavbar = ({ userType = "guest", variant = "dark" }) => {
   const navigate = useNavigate();
+  const [isShrunk, setIsShrunk] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsShrunk(true);
+      } else {
+        setIsShrunk(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <nav
-      className={`bank-navbar ${
-        variant === "gradient" ? "navbar-gradient" : ""
+      className={`bank-navbar ${variant === "gradient" ? "navbar-gradient" : ""} ${
+        isShrunk ? "navbar-shrink" : ""
       }`}
     >
       <div className="navbar-logo">
@@ -17,6 +31,7 @@ const BankNavbar = ({ userType = "guest", variant = "dark" }) => {
           <span>Coinnect</span>
         </Link>
       </div>
+
       <ul className="navbar-links">
         {userType === "guest" && (
           <>
@@ -29,13 +44,22 @@ const BankNavbar = ({ userType = "guest", variant = "dark" }) => {
             <li>
               <button
                 className="navbar-signup-btn"
+                onClick={() => navigate("/login")}
+              >
+                Login
+              </button>
+            </li>
+            <li>
+              <button
+                className="navbar-signup-btn"
                 onClick={() => navigate("/register")}
               >
-                Sign Up / Login
+                Sign Up
               </button>
             </li>
           </>
         )}
+
         {userType === "customer" && (
           <>
             <li>
@@ -49,6 +73,7 @@ const BankNavbar = ({ userType = "guest", variant = "dark" }) => {
             </li>
           </>
         )}
+
         {userType === "employee" && (
           <>
             <li>

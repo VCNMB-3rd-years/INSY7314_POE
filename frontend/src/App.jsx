@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext.jsx";
 
 import Landing from "./pages/Landing.jsx";
 
@@ -15,26 +16,28 @@ import VerifyTransaction from "./pages/employee/VerifyTransaction.jsx";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* Default Route */}
-        <Route path="/" element={<Landing />} />
+     <AuthProvider>
+      <Router>
+        <Routes>
+          {/* Default Route */}
+          <Route path="/" element={<Landing />} />
 
-        {/* Account Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+          {/* Account Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
-        {/* Customer Routes */}
-        <Route path="/custDashboard" element={<CustDashboard />} />
-        <Route path="/createTransaction" element={<CreateTransaction />} />
-        <Route path="/custTransactions" element={<CustTransactions />} />
+          {/* Customer Routes */}
+          <Route path="/custDashboard" element={<CustDashboard />} />
+          <Route path="/createTransaction" element={<CreateTransaction />} />
+          <Route path="/custTransactions" element={<CustTransactions />} />
 
-        {/* Employee Routes */}
-        <Route path="/empDashboard" element={<EmpDashboard />} />
-        <Route path="/viewTransactions" element={<AllTransactions />} />
-        <Route path="/verifyTransaction" element={<VerifyTransaction />} />
-      </Routes>
-    </Router>
+          {/* Employee Routes */}
+          <Route path="/empDashboard" element={<EmpDashboard />} />
+          <Route path="/viewTransactions" element={<AllTransactions />} />
+          <Route path="/verifyTransaction" element={<VerifyTransaction />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

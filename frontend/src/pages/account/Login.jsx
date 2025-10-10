@@ -1,49 +1,39 @@
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import "./Login.css";
 
-const Login = () => {
+export default function Login() {
+  const { login } = useAuth();
   const navigate = useNavigate();
+
+  // local state
+  const [userType, setUserType] = useState("customer");
   const [username, setUsername] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  // Temporary users for testing
-  const mockUsers = [
-    {
-      username: "customer1",
-      accountNumber: "10001",
-      password: "1234",
-      type: "customer",
-    },
-    {
-      username: "employee1",
-      accountNumber: "20001",
-      password: "1234",
-      type: "employee",
-    },
-  ];
-
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
 
-    // Replace this with real backend call later
-    const user = mockUsers.find(
-      (u) =>
-        u.username === username &&
-        u.accountNumber === accountNumber &&
-        u.password === password
-    );
+    try {
+      // attempt login
+      const response = await login(userType, username, password);
 
-    if (!user) {
-      setError("Invalid username, account number, or password");
-      return;
+      
+      if (userType === "customer") navigate("/custDashboard");
+      else if (userType === "employee") navigate("/empDashboard");
+      else navigate("/");
+
+      console.log("Login successful:", response);
+    } catch (err) {
+      console.error("Login error:", err);
+      setError(
+        err?.response?.data?.message ||
+          "Server connection failed. Please try again later."
+      );
     }
-
-    // Redirect based on user type
-    if (user.type === "customer") navigate("/custDashboard");
-    else if (user.type === "employee") navigate("/empDashboard");
   };
 
   return (
@@ -54,18 +44,20 @@ const Login = () => {
       <div className="login-form-container">
         <h1>Login</h1>
         <form className="login-form" onSubmit={handleLogin}>
+          <select
+            value={userType}
+            onChange={(e) => setUserType(e.target.value)}
+            required
+          >
+            <option value="customer">Customer</option>
+            <option value="employee">Employee</option>
+          </select>
+<br />
           <input
             type="text"
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Account Number"
-            value={accountNumber}
-            onChange={(e) => setAccountNumber(e.target.value)}
             required
           />
           <input
@@ -75,15 +67,16 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+
           {error && <p style={{ color: "#e74c3c" }}>{error}</p>}
+
           <button type="submit">Login</button>
         </form>
       </div>
+
       <div className="login-image-container">
         <img src="/phone.jpg" alt="Coinnect Logo" />
       </div>
     </div>
   );
-};
-
-export default Login;
+}
