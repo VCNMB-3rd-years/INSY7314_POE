@@ -20,4 +20,13 @@ workflows:
           # https://circleci.com/developer/images/image/cimg/node
           version: '16.10'
           # If you are using yarn, change the line below from "npm" to "yarn"
-          pkg-manager: npm
+          pkg-manager: npM
+
+      build:
+        docker:
+          - image: cimg/node:18.16
+        working_directory: ~/project/frontend 
+        steps:
+          - checkout
+          - run: npm ci
+          - run: npm run build
