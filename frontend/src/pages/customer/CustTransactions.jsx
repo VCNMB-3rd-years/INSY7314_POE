@@ -1,113 +1,107 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppSidebar from "../../components/AppSidebar";
-import { getTransaction } from "../../services/apiService";
+import { useAuth } from "../../context/AuthContext";
+import axios from "axios";
 
 export default function CustTransactions() {
   const navigate = useNavigate();
+  const { user, token } = useAuth(); // get current user info from AuthContext
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const backToDash = () => {
     navigate("/custDashboard");
   };
-  
-const fetchTransactions = async () => {
-    // fetch all transactions using the apiService method we created earlier, storing the response in a temp variable
-    const res = await getTransaction();
-    // and update our transactions variable with the response data
-    setTransactions(res.data);
+
+  const fetchCustomerTransactions = async () => {
+    if (!user?.customerId) {
+      setError("Customer ID not found. Please log in again.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await axios.get(
+        `http://localhost:3000/v1/transaction/customer/${user.customerId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setTransactions(res.data.transactions || []);
+    } catch (err) {
+      console.error(
+        "Error fetching customer transactions:",
+        err.response?.data || err.message
+      );
+      setError(err.response?.data?.message || "Failed to fetch transactions.");
+    } finally {
+      setLoading(false);
+    }
   };
-  // this method will run as soon as the page is loaded
+
   useEffect(() => {
-    // fetching all of the books in the background
-    fetchTransactions();
-  }, []);
+    fetchCustomerTransactions();
+  }, [user?.customerId, token]);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        background: "#1a1a1a",
-        fontFamily: "Inter, sans-serif",
-      }}
-    >
+    <div style={{ display: "flex", minHeight: "100vh", background: "#1a1a1a", fontFamily: "Inter, sans-serif" }}>
       <AppSidebar userType="customer" />
-      <div
-        style={{
-          flex: 1,
-          padding: "3rem 2rem",
-          color: "#fff",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "flex-start",
-        }}
-      >
-        <div
-          style={{
-            background: "#2a2a2a",
-            padding: "2rem",
-            borderRadius: "1rem",
-            boxShadow: "0 8px 20px rgba(0,0,0,0.3)",
-            width: "100%",
-            maxWidth: "700px",
-          }}
-        >
-          <h1 style={{ fontSize: "1.8rem", marginBottom: "0.5rem" }}>
-            📜 My Transactions
-          </h1>
-          <p
-            style={{ color: "#bbb", marginBottom: "2rem", fontSize: "0.95rem" }}
-          >
+      <div style={{ flex: 1, padding: "3rem 2rem", color: "#fff", display: "flex", justifyContent: "center", alignItems: "flex-start" }}>
+        <div style={{ background: "#2a2a2a", padding: "2rem", borderRadius: "1rem", boxShadow: "0 8px 20px rgba(0,0,0,0.3)", width: "100%", maxWidth: "700px" }}>
+          <h1 style={{ fontSize: "1.8rem", marginBottom: "0.5rem" }}>My Transactions</h1>
+          <p style={{ color: "#bbb", marginBottom: "2rem", fontSize: "0.95rem" }}>
             Here you can view all your past transactions.
           </p>
 
-          {/* Transaction list */}
-          {transactions.length > 0 ? (
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                marginBottom: "1.5rem",
-              }}
-            >
+          {/* Loading / Error */}
+          {loading && <p style={{ color: "#888" }}>Loading transactions...</p>}
+          {error && <p style={{ color: "#c62828" }}>{error}</p>}
+
+          {/* Transaction List */}
+          {!loading && !error && transactions.length > 0 ? (
+            <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "1.5rem" }}>
               <thead>
                 <tr style={{ textAlign: "left", color: "#bbb" }}>
-                  <th style={tableHeader}>Recipient</th>
-                  <th style={tableHeader}>Amount</th>
-                  <th style={tableHeader}>Reference</th>
+                  <th style={{ padding: "0.5rem" }}>Recipient</th>
+                  <th style={{ padding: "0.5rem" }}>Amount</th>
+                  <th style={{ padding: "0.5rem" }}>Reference</th>
+                  <th style={{ padding: "0.5rem" }}>Swift Code</th>
+                  <th style={{ padding: "0.5rem" }}>Status</th>
                 </tr>
               </thead>
               <tbody>
                 {transactions.map((t) => (
-                  <tr
-                    key={t.id}
-                    style={{
-                      borderBottom: "1px solid #444",
-                    }}
-                  >
-                    <td style={tableCell}>{t.recipient}</td>
-                    <td style={tableCell}>{t.amount}</td>
-                    <td style={tableCell}>{t.reference}</td>
+                  <tr key={t.transactionId} style={{ borderBottom: "1px solid #444" }}>
+                    <td style={{ padding: "0.5rem" }}>{t.recipientReference}</td>
+                    <td style={{ padding: "0.5rem" }}>{t.amount}</td>
+                    <td style={{ padding: "0.5rem" }}>{t.customerReference}</td>
+                    <td style={{ padding: "0.5rem" }}>{t.swiftCode || "—"}</td>
+                    <td style={{ padding: "0.5rem" }}>{t.status ? "Verified " : "Pending "}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           ) : (
-            <p style={{ color: "#888" }}>No transactions yet. 💡</p>
+            !loading && !error && <p style={{ color: "#888" }}>No transactions yet. </p>
           )}
 
           <button
-            style={{
-              ...buttonSecondaryStyle,
-              width: "100%",
-            }}
+            style={{ marginTop: "1rem", width: "100%", padding: "0.75rem", borderRadius: "0.5rem", background: "#555", color: "#fff", fontWeight: "bold", cursor: "pointer" }}
             onClick={backToDash}
           >
-            ⬅ Back to Dashboard
+            Back to Dashboard
           </button>
         </div>
       </div>
     </div>
   );
 }
+
 
 const tableHeader = {
   padding: "0.75rem 1rem",

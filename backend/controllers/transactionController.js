@@ -12,33 +12,27 @@ const getTransactions = async (req, res) => {
   }
 };
 
-// GET: get a singluar transaction by id
+// GET: all transactions for a specific customer
 const getTransaction = async (req, res) => {
-  // get the id of the transaction that the user is looking for, from the parameters
-  const id = req.params.id;
+  const customerId = req.params.customerId;
 
-  // null check
-  if (!id) {
-    res.status(400).json({ message: "Please provide an ID to search for!" });
+  if (!customerId) {
+    return res.status(400).json({ message: "Customer ID is required." });
   }
 
   try {
-    // try find the transaction using the provided ID
-    const transaction = await Transaction.findById(id);
+    const transactions = await Transaction.find({ customerId });
 
-    // if no transaction is found matching the provided ID, we should return 404 with an informative message
-    if (!transaction) {
-      res.status(404).json({ message: "No transaction found that matches that ID." });
+    if (!transactions || transactions.length === 0) {
+      return res.status(404).json({ message: "No transactions found for this customer." });
     }
 
-    // otherwise, return the transaction
-    res.status(200).json(transaction);
+    res.status(200).json({ transactions });
   } catch (error) {
-    // throw a server error if an issue occurs
-    res.status(500).json({ error: error.message });
+    console.error("Error fetching transactions:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
 
 // POST: create a transaction
 const createTransaction = async (req, res) => {
@@ -49,12 +43,12 @@ const createTransaction = async (req, res) => {
     }
 
     const { status, recipientReference, customerReference, amount, swiftCode } = req.body;
-    const customerId = req.user.customerId; // 👈 pulled from verified token
+    const customerId = req.user.customerId; 
 
     // Validate required fields
     if (!recipientReference || !customerReference || !amount || !swiftCode) {
       return res.status(400).json({
-        message: "Missing required fields: recipientReference, customerReference, or amount."
+        message: "Missing required fields: recipientReference, customerReference, swift code or amount."
       });
     }
 
@@ -81,7 +75,6 @@ const createTransaction = async (req, res) => {
   }
 };
 
-
 // PUT: verify swift transaction code
 const updateStatus = async (req, res) => {
   // first we get the ID from the url
@@ -102,7 +95,7 @@ const updateStatus = async (req, res) => {
     // finally, ensure that the new version (post update) is returned, rather than the old transaction
     const updatedTransaction = await Transaction.findByIdAndUpdate(
       id,
-      { status, recipientReference, customerReference, amount, customerId},
+      { status, recipientReference, customerReference, amount, customerId, swiftCode},
       { new: true }
     );
     // spit it out encoded in json

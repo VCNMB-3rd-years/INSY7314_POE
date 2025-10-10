@@ -32,8 +32,16 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/createTransaction" element={<CreateTransaction />} />
-          <Route path="/custTransactions" element={<CustTransactions />} />
+          
+          <Route path="/createTransaction" element={
+            <ProtectedRoute>
+              <CreateTransaction />
+              </ProtectedRoute>
+            } />
+          <Route path="/custTransactions" element={
+            <ProtectedRoute>
+              <CustTransactions />
+              </ProtectedRoute>} />
 
           <Route
             path="/empDashboard"

@@ -18,8 +18,8 @@ const router = express.Router();
 // GET /api/transactions/getTransactions
 router.get('/getTransactions', getTransactions);
 
-// GET /api/transactions/:id
-router.get('/:id', validateRequest(txSchemas.getTransaction), getTransaction);
+// GET /transaction/customer/:customerId
+router.get('/customer/:customerId', getTransaction);
 
 // POST /api/transactions/createTransaction
 router.post(

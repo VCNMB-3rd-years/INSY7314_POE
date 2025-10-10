@@ -38,7 +38,7 @@ export default function CreateTransaction() {
       customerReference: transactionData.customerReference,
       amount: Number(transactionData.amount),
       customerId: user.customerId,
-      swiftCode: transactionData.swiftCode,
+      swiftCode: transactionData.swiftCode, 
     };
 
     try {
