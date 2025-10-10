@@ -111,7 +111,7 @@ jobs:
             else
               echo "No start script found, skipping..."
             fi
-  sonarqube:
+ sonarqube:
     docker:
       - image: cimg/node:18.16
     working_directory: ~/build
@@ -121,12 +121,14 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - run:
-          name: Fix sonar-scanner permissions
-          command: chmod +x ./node_modules/sonar-scanner/bin/sonar-scanner
+          name: Install Sonar Scanner locally
+          command: npm install sonar-scanner
       - run:
           name: Run SonarQube analysis
           command: |
             SONAR_BRANCH="${CIRCLE_BRANCH:-master}"
+            echo "Sonar branch value is: $SONAR_BRANCH"
+            echo "Sonar org value is: $SONAR_ORG"
             npx sonar-scanner \
               -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
               -Dsonar.organization="$SONAR_ORG" \
@@ -135,6 +137,7 @@ jobs:
               -Dsonar.login="$SONAR_TOKEN" \
               -Dsonar.branch.name="$SONAR_BRANCH" \
               -Dsonar.sources="."
+
 
 
 workflows:
