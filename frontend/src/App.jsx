@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext.jsx";
 
 import Landing from "./pages/Landing.jsx";
-
 import Login from "./pages/account/Login.jsx";
 import Register from "./pages/account/Register.jsx";
 
@@ -13,28 +13,41 @@ import EmpDashboard from "./pages/employee/EmpDashboard.jsx";
 import AllTransactions from "./pages/employee/AllTransactions.jsx";
 import VerifyTransaction from "./pages/employee/VerifyTransaction.jsx";
 
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* Default Route */}
-        <Route path="/" element={<Landing />} />
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
-        {/* Account Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+          <Route
+            path="/custDashboard"
+            element={
+              <ProtectedRoute>
+                <CustDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/createTransaction" element={<CreateTransaction />} />
+          <Route path="/custTransactions" element={<CustTransactions />} />
 
-        {/* Customer Routes */}
-        <Route path="/custDashboard" element={<CustDashboard />} />
-        <Route path="/createTransaction" element={<CreateTransaction />} />
-        <Route path="/custTransactions" element={<CustTransactions />} />
-
-        {/* Employee Routes */}
-        <Route path="/empDashboard" element={<EmpDashboard />} />
-        <Route path="/viewTransactions" element={<AllTransactions />} />
-        <Route path="/verifyTransaction" element={<VerifyTransaction />} />
-      </Routes>
-    </Router>
+          <Route
+            path="/empDashboard"
+            element={
+              <ProtectedRoute>
+                <EmpDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/viewTransactions" element={<AllTransactions />} />
+          <Route path="/verifyTransaction" element={<VerifyTransaction />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

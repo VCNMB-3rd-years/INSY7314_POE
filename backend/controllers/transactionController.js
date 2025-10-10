@@ -42,27 +42,42 @@ const getTransaction = async (req, res) => {
 
 // POST: create a transaction
 const createTransaction = async (req, res) => {
-  const { status, recipientReference, customerReference, amount } = req.body;
-
-  // Make sure the customerId comes from the logged-in user
-  const customerId = req.user.customerId;
-
-  if (!recipientReference || !customerReference || !amount) {
-    return res.status(400).json({ message: "Please provide all required fields." });
-  }
-
   try {
+    // Ensure the user is logged in and has an ID
+    if (!req.user || !req.user.customerId) {
+      return res.status(401).json({ message: "Unauthorized — please log in first." });
+    }
+
+    const { status, recipientReference, customerReference, amount, swiftCode } = req.body;
+    const customerId = req.user.customerId; // 👈 pulled from verified token
+
+    // Validate required fields
+    if (!recipientReference || !customerReference || !amount || !swiftCode) {
+      return res.status(400).json({
+        message: "Missing required fields: recipientReference, customerReference, or amount."
+      });
+    }
+
+    // Create the transaction
     const transaction = await Transaction.create({
-      status: status,
+      status,
       recipientReference,
       customerReference,
       amount,
-      customerId
+      customerId,
+      swiftCode
     });
 
-    res.status(201).json(transaction);
+    res.status(201).json({
+      message: "Transaction created successfully.",
+      transaction
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Create Transaction Error:", error);
+    res.status(500).json({
+      message: "An error occurred while creating the transaction.",
+      error: error.message
+    });
   }
 };
 
@@ -72,7 +87,7 @@ const updateStatus = async (req, res) => {
   // first we get the ID from the url
   const id = req.params.id;
   // then the updated information from the body
-  const { status, recipientReference, customerReference, amount, customerId} = req.body;
+  const { status, recipientReference, customerReference, amount, customerId, swiftCode} = req.body;
 
   try {
     // firstly find the transaction we need to update

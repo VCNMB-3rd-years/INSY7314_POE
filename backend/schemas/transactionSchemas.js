@@ -2,13 +2,13 @@
 module.exports = {
   createTransaction: {
     body: {
-      status: { pattern: 'status', optional: true },
-      customerBankId: 'objectId',
+      status: { default: 'false', optional: true },
+      customerId: 'objectId',
       amount: 'amount',
-      currency: 'currency',
-      provider: 'provider',
-      payee_account: { pattern: 'accountNumber', optional: false },
-      swift_code: { pattern: 'swift', optional: false }
+      //currency: 'currency',
+      //provider: 'provider',
+      //payee_account: { pattern: 'accountNumber', optional: false },
+      swiftCode: { pattern: 'swift', optional: false }
     }
   },
 
