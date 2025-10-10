@@ -13,6 +13,15 @@ const bankRoute = require('./routes/bankRoute.js');
 const customerRoute = require('./routes/customerRoute.js');
 const transactionRoute = require('./routes/transactionRoute.js');
 
+//mkcerts imports
+const https = require('https');
+const fs = require('fs');
+
+//create new variables to hold where our certificate lives we did "npm install 'fs'"
+const options ={
+    key: fs.readFileSync('./certs/localhost+1-key.pem'),
+    cert: fs.readFileSync('./certs/localhost+1.pem'),
+}
 //Input Sanitization imports
 // const mongoSanitize = require('express-mongo-sanitize')
 //const xss = require('xss-clean')
@@ -102,9 +111,11 @@ app.use((err, req, res, next) => {
 // ---------- Start Server ----------
 const port = process.env.API_PORT || 3000;
 
-connectToMongo();
+// connectToMongo();
 
-app.listen(port, () => {
-  console.log(`✅ Secure API listening on port ${port}`);
-});
-
+// app.listen(port, () => {
+//   console.log(`Secure API listening on port ${port}`);
+// });
+https.createServer(options, app).listen(port, ()=>{
+    console.log(`The API is now SECURELY listening on port ${port}`)
+})
