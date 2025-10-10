@@ -21,6 +21,22 @@ jobs:
       - run:
           name: "Say hello"
           command: "echo Hello, World!"
+          
+  build-frontend:
+    docker:
+      - image: cimg/node:current
+    steps:
+      - checkout
+      - run:
+          name: Install frontend dependencies
+          command: |
+            cd frontend
+            npm ci
+      - run:
+          name: Build frontend
+          command: |
+            cd frontend
+            npm run build
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/guides/orchestrate/workflows/ & https://circleci.com/docs/reference/configuration-reference/#workflows
