@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
-//first "npm intall fs" this is so that we can loaf things from our certs folder
-import fs from 'fs'
 import react from '@vitejs/plugin-react'
+import fs from 'fs'
 
 // https://vite.dev/config/
 export default defineConfig({

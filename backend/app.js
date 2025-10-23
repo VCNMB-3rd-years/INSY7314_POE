@@ -111,7 +111,7 @@ app.use((err, req, res, next) => {
 // ---------- Start Server ----------
 const port = process.env.API_PORT || 3000;
 
-// connectToMongo();
+connectToMongo();
 
 // app.listen(port, () => {
 //   console.log(`Secure API listening on port ${port}`);
