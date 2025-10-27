@@ -11,11 +11,20 @@ const securityMiddlewares = require('./middlewares/securityMiddleware.js');
 
 
 // import routes
-const authRoute = require("./routes/authRoute.js");
-const bankRoute = require("./routes/bankRoute.js");
-const customerRoute = require("./routes/customerRoute.js");
-const transactionRoute = require("./routes/transactionRoute.js");
+const authRoute = require('./routes/authRoute.js');
+const bankRoute = require('./routes/bankRoute.js');
+const customerRoute = require('./routes/customerRoute.js');
+const transactionRoute = require('./routes/transactionRoute.js');
 
+//mkcerts imports
+const https = require('https');
+const fs = require('fs');
+
+//create new variables to hold where our certificate lives we did "npm install 'fs'"
+const options ={
+    key: fs.readFileSync('./certs/localhost+1-key.pem'),
+    cert: fs.readFileSync('./certs/localhost+1.pem'),
+}
 //Input Sanitization imports
 // const mongoSanitize = require('express-mongo-sanitize')
 //const xss = require('xss-clean')
@@ -27,6 +36,14 @@ const app = express();
 
 // Parse JSON safely with 20kb limit
 app.use(express.json({ limit: '20kb' }));
+// calling in express.json middleware, so that our app can handle json
+//app.use(express.json());
+
+//Prevents  NoSQL query injection
+//app.use(mongoSanitize())
+
+//Prevents site script xss
+//app.use(xss())
 
 // Basic security headers (X-Frame, CSP, XSS filters, etc.)
 app.use(
@@ -105,28 +122,25 @@ app.use(
 );
 
 // ---------- Routes ----------
-app.use("/v1/auth", authRoute);
-app.use("/v1/bank", bankRoute);
-app.use("/v1/customer", customerRoute);
-app.use("/v1/transaction", transactionRoute);
+app.use('/v1/auth', authRoute);
+app.use('/v1/bank', bankRoute);
+app.use('/v1/customer', customerRoute);
+app.use('/v1/transaction', transactionRoute);
 
 // ---------- Error Handling ----------
 app.use((err, req, res, next) => {
-  console.error("Unhandled Error:", err);
-  res.status(500).json({ error: "Internal server error" });
+  console.error('Unhandled Error:', err);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
 // ---------- Start Server ----------
 const port = process.env.API_PORT || 3000;
 
-const options = {
-  key: fs.readFileSync("./certs/localhost+1-key.pem"),
-  cert: fs.readFileSync("./certs/localhost+1.pem"),
-};
+connectToMongo();
 
-module.exports = app;
-
-https.createServer(options, app).listen(port, () => {
-  console.log(`✅ Secure API running on https://localhost:${port}`);
-});
-
+// app.listen(port, () => {
+//   console.log(`Secure API listening on port ${port}`);
+// });
+https.createServer(options, app).listen(port, ()=>{
+    console.log(`The API is now SECURELY listening on port ${port}`)
+})
