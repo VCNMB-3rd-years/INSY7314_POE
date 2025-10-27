@@ -1,4 +1,4 @@
-// controllers/transactionController.js
+//controllers/transactionController.js
 const Transaction = require("../models/transactionModel.js");
 
 // GET: all transaction

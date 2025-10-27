@@ -19,9 +19,18 @@ const verifyToken = (req, res, next) => {
   });
 };
 
+const authorizeRole = (allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({ message: "Access denied: insufficient role" });
+    }
+    next();
+  };
+};
+
 // Invalidate a token (for logout)
 const invalidateToken = (token) => {
   tokenBlacklist.add(token);
 };
 
-module.exports = { verifyToken, invalidateToken };
+module.exports = { verifyToken, invalidateToken, authorizeRole};
