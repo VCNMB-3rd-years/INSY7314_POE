@@ -1,45 +1,153 @@
 version: 2.1
 
-orbs:
-  node: circleci/node@5.2
-
 jobs:
-  # --- FRONTEND BUILD ---
+  # --- Simple sanity check ---
+  say-hello:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - run:
+          name: "Say hello"
+          command: echo "Hello, World!"
+
+  # --- Install frontend dependencies ---
+  install-frontend-deps:
+    docker:
+      - image: cimg/node:18.16
+    working_directory: /home/circleci/project
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - frontend-deps-{{ checksum "frontend/package-lock.json" }}
+            - frontend-deps-
+      - run:
+          name: Install frontend dependencies
+          command: |
+            cd frontend
+            npm ci
+      - save_cache:
+          key: frontend-deps-{{ checksum "frontend/package-lock.json" }}
+          paths:
+            - frontend/node_modules
+
+  # --- Build frontend ---
   build-frontend:
     docker:
       - image: cimg/node:18.16
-    working_directory: ~/project/frontend
+    working_directory: /home/circleci/project
     steps:
       - checkout
-      - run:
-          name: Install frontend dependencies
-          command: npm ci
+      - restore_cache:
+          keys:
+            - frontend-deps-{{ checksum "frontend/package-lock.json" }}
+            - frontend-deps-
       - run:
           name: Build frontend
-          command: npm run build
+          command: |
+            cd frontend
+            npm run build
       - run:
           name: Run frontend tests
-          command: npm test || echo "No tests found"
+          command: |
+            cd frontend
+            npm test || echo "No tests found"
 
-  # --- BACKEND BUILD ---
+  # --- Install backend dependencies ---
+  install-backend-deps:
+    docker:
+      - image: cimg/node:18.16
+    working_directory: /home/circleci/project
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - backend-deps-{{ checksum "backend/package-lock.json" }}
+            - backend-deps-
+      - run:
+          name: Install backend dependencies
+          command: |
+            cd backend
+            npm ci
+      - save_cache:
+          key: backend-deps-{{ checksum "backend/package-lock.json" }}
+          paths:
+            - backend/node_modules
+
+  # --- Build backend ---
   build-backend:
     docker:
       - image: cimg/node:18.16
-    working_directory: ~/project/backend
+    working_directory: /home/circleci/project
     steps:
       - checkout
-      - run:
-          name: Install backend dependencies
-          command: npm ci
+      - restore_cache:
+          keys:
+            - backend-deps-{{ checksum "backend/package-lock.json" }}
+            - backend-deps-
       - run:
           name: Run backend tests
-          command: npm test || echo "No tests found"
+          command: |
+            cd backend
+            npm test || echo "No tests found"
+      - run:
+          name: Build backend (if applicable)
+          command: |
+            cd backend
+            if grep -q '"build"' package.json; then
+              npm run build
+            else
+              echo "No build script found, skipping..."
+            fi
       - run:
           name: Start backend server (optional)
-          command: npm start & sleep 5
+          command: |
+            cd backend
+            if grep -q '"start"' package.json; then
+              npm start &
+              sleep 5
+              echo "Backend started (brief check)"
+            else
+              echo "No start script found, skipping..."
+            fi
+
+  # --- SonarQube analysis ---
+  sonarqube:
+    docker:
+      - image: sonarsource/sonar-scanner-cli
+    working_directory: ~/build
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/workspace
+      - run:
+          name: Run SonarQube analysis
+          command: |
+            SONAR_BRANCH="${CIRCLE_BRANCH:-main}"
+            echo "Sonar branch value is: $SONAR_BRANCH"
+            echo "Sonar org value is: $SONAR_ORG"
+            sonar-scanner \
+              -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
+              -Dsonar.organization="$SONAR_ORG" \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.exclusions="/android/,/ios/" \
+              -Dsonar.login="$SONAR_TOKEN" \
+              -Dsonar.branch.name="$SONAR_BRANCH" \
+              -Dsonar.sources="."
 
 workflows:
-  build_and_test_all:
+  version: 2
+  main-workflow:
     jobs:
-      - build-frontend
-      - build-backend
+      - say-hello
+      - install-frontend-deps
+      - install-backend-deps
+      - build-frontend:
+          requires:
+            - install-frontend-deps
+      - build-backend:
+          requires:
+            - install-backend-deps
+      - sonarqube

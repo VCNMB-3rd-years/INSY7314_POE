@@ -5,30 +5,21 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
 const sanitize = require("mongo-sanitize");
-const fs = require("fs");
-const https = require("https");
-const securityMiddlewares = require('./middlewares/securityMiddleware.js');
+const securityMiddlewares = require("./middlewares/securityMiddleware.js");
+const csrf = require("csurf");
+const cookieParser = require("cookie-parser");
 
-
-// import routes
+// Route imports
 const authRoute = require("./routes/authRoute.js");
 const bankRoute = require("./routes/bankRoute.js");
 const customerRoute = require("./routes/customerRoute.js");
 const transactionRoute = require("./routes/transactionRoute.js");
 
-//Input Sanitization imports
-// const mongoSanitize = require('express-mongo-sanitize')
-//const xss = require('xss-clean')
-
-// initialize express
 const app = express();
 
-// ---------- Global Middlewares ----------
+// ---------- Security & Core Setup ----------
+app.use(express.json({ limit: "20kb" }));
 
-// Parse JSON safely with 20kb limit
-app.use(express.json({ limit: '20kb' }));
-
-// Basic security headers (X-Frame, CSP, XSS filters, etc.)
 app.use(
   helmet({
     contentSecurityPolicy:
@@ -44,40 +35,35 @@ app.use(
               upgradeInsecureRequests: [],
             },
           }
-        : false, // disables CSP in dev for Vite
-    crossOriginEmbedderPolicy: false, // avoids CORS issues with Vite dev
+        : false,
+    crossOriginEmbedderPolicy: false,
   })
 );
 
-// HSTS (HTTP Strict Transport Security) for 1 year
 app.use(
   helmet.hsts({
-    maxAge: 31536000, // 1 year in seconds
+    maxAge: 31536000,
     includeSubDomains: true,
     preload: true,
   })
 );
 
-// Force HTTPS in production (redirect HTTP → HTTPS)
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === "production") {
   app.use((req, res, next) => {
-    if (req.headers['x-forwarded-proto'] !== 'https') {
+    if (req.headers["x-forwarded-proto"] !== "https") {
       return res.redirect(`https://${req.headers.host}${req.url}`);
     }
     next();
   });
-} 
-// set up our security middleware
+}
+
 securityMiddlewares(app);
 
-// log every request
-// the logger will look at the request, generate a response, then handle the next incoming request
+// ---------- Utility Middlewares ----------
 app.use((req, res, next) => {
-    // print out to the console (terminal) what type of method was used and to what endpoint that request was made
-    console.log(`${req.method} ${req.url}`)
-    // prepare to handle the next incoming request
-    next();
-  });
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
 
 app.use((req, res, next) => {
   if (req.body) req.body = sanitize(req.body);
@@ -85,48 +71,79 @@ app.use((req, res, next) => {
   next();
 });
 
-// 🔒 Global no-cache policy (best default for financial & auth APIs)
 app.use((req, res, next) => {
-  res.set('Cache-Control', 'no-store');
+  res.set("Cache-Control", "no-store");
   next();
 });
 
-// Logger for development
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 
-// Basic rate limiter
-app.use(
-  rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit per IP
-    standardHeaders: true,
-    legacyHeaders: false,
-  })
-);
+// ---------- Adaptive Rate Limiting ----------
 
-// ---------- Routes ----------
+// General requests (default)
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 min
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: "Too many requests, please try again later.",
+});
+
+// Login endpoint limiter
+const loginLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 min
+  max: 5, // 5 attempts per 10 minutes
+  message: "Too many login attempts. Please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Registration endpoint limiter
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10, // 10 registrations per hour
+  message: "Too many registration attempts from this IP. Try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Apply general limiter globally
+app.use(generalLimiter);
+// Apply specific limiters to critical routes
+app.use("/v1/auth/login", loginLimiter);
+app.use("/v1/auth/register", registerLimiter);
+
+// ---------- CSRF Protection ----------
+app.use(cookieParser());
+const csrfProtection = csrf({
+  cookie: {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+  },
+});
+
+// Apply CSRF to all unsafe methods
+app.use((req, res, next) => {
+  if (["GET", "HEAD", "OPTIONS"].includes(req.method)) return next();
+  csrfProtection(req, res, next);
+});
+
+// Provide CSRF token endpoint for frontend
+app.get("/csrf-token", csrfProtection, (req, res) => {
+  res.json({ csrfToken: req.csrfToken() });
+});
+
+// ---------- API Routes ----------
 app.use("/v1/auth", authRoute);
 app.use("/v1/bank", bankRoute);
 app.use("/v1/customer", customerRoute);
 app.use("/v1/transaction", transactionRoute);
 
-// ---------- Error Handling ----------
+// ---------- Global Error Handler ----------
 app.use((err, req, res, next) => {
   console.error("Unhandled Error:", err);
   res.status(500).json({ error: "Internal server error" });
 });
 
-// ---------- Start Server ----------
-const port = process.env.API_PORT || 3000;
-
-const options = {
-  key: fs.readFileSync("./certs/localhost+1-key.pem"),
-  cert: fs.readFileSync("./certs/localhost+1.pem"),
-};
-
 module.exports = app;
-
-https.createServer(options, app).listen(port, () => {
-  console.log(`✅ Secure API running on https://localhost:${port}`);
-});
-

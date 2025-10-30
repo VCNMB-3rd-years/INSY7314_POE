@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import AppSidebar from "../../components/AppSidebar";
+import AppSidebar from "../../../../frontend/src/components/AppSidebar";
 
 export default function VerifyTransaction() {
   const navigate = useNavigate();

@@ -45,7 +45,7 @@ export default function CreateTransaction() {
       await apiCreateTransaction(payload, token); // pass token to API
       setMessage("Transaction created successfully!");
       setMessageType("success");
-
+      navigate("/custTransactions");
       // Reset form
       setTransactionData({
         recipientReference: "",

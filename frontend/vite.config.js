@@ -1,14 +1,17 @@
-import { defineConfig } from "vite";
-import fs from "fs";
-import react from "@vitejs/plugin-react";
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import fs from 'fs'
 
+// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  //we then set the server
   server: {
-    port: 5173, // optional
+    //https settings
     https: {
-      key: fs.readFileSync("./certs/localhost+1-key.pem"),
-      cert: fs.readFileSync("./certs/localhost+1.pem"),
-    },
-  },
-});
+      //and pass our private kep, and certificate files (like the backend)
+      key: fs.readFileSync('./certs/localhost+1-key.pem'),
+      cert: fs.readFileSync('./certs/localhost+1.pem'),
+    }
+  }
+})
