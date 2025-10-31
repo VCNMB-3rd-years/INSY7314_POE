@@ -4,7 +4,7 @@ const crypto = require('crypto');
 
 const TransactionSchema = new mongoose.Schema({
   transactionId: { type: String, default: () => crypto.randomUUID() },
-  status: { type: Boolean, required: true },
+  status: { type: String, required: true }, //pending, approved or denied
   // link to customer by customerId (from Customer model)
   customerId: { type: String, ref: "Customer", required: true },
   createdAt: { type: Date, default: Date.now },

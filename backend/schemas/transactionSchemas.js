@@ -2,7 +2,7 @@
 module.exports = {
   createTransaction: {
     body: {
-      status: { default: 'false', optional: true },
+      status: { default: 'pending', optional: true },
       customerId: 'objectId',
       amount: 'amount',
       //currency: 'currency',

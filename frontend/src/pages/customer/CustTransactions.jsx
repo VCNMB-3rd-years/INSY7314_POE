@@ -81,7 +81,7 @@ export default function CustTransactions() {
                     <td style={{ padding: "0.5rem" }}>{t.amount}</td>
                     <td style={{ padding: "0.5rem" }}>{t.customerReference}</td>
                     <td style={{ padding: "0.5rem" }}>{t.swiftCode || "—"}</td>
-                    <td style={{ padding: "0.5rem" }}>{t.status ? "Verified " : "Pending "}</td>
+                    <td style={{ padding: "0.5rem" }}>{t.status == "Pending "}</td>
                   </tr>
                 ))}
               </tbody>
