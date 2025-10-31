@@ -9,7 +9,11 @@ export const getTransactions = () => axios.get('/transaction/getTransactions');
 export const getTransaction = (id) => axios.get(`/transaction/${id}`);
 
 // POST request, to create a new transaction
-export const createTransaction = (transactionData) => axios.post('/transaction/createTransaction', transactionData);
+export const createTransaction = (transactionData, token) => {
+  return axios.post("/transaction/createTransaction", transactionData, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
 
 // PUT request, to update an existing transaction
 export const updateStatus = (id, transactionData) => axios.put(`/transaction/${id}`, transactionData);
@@ -23,3 +27,10 @@ export const register = (customerData) => axios.post('/auth/register', customerD
 
 // POST to login a user
 export const login = (customerData) => axios.post('/auth/login', customerData);
+
+// GET logout credentials
+export const logout = (token) => {
+  return axios.get("/v1/auth/logout", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
