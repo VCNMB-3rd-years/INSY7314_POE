@@ -9,6 +9,7 @@ const Register = () => {
   const [messageType, setMessageType] = useState(""); // "success" or "error"
 
   const [customerData, setCustomerData] = useState({
+    userType: "customer",
     firstName: "",
     lastName: "",
     nationalId: "",
@@ -19,26 +20,25 @@ const Register = () => {
   const [error, setError] = useState("");
 
   const handleRegister = async (e) => {
-    e.preventDefault();
-    setError("");
+  e.preventDefault();
+  setError("");
+  setMessage("");
 
-    try {
-      const response = await register(customerData); // axios call
-      setMessage("Transaction created successfully!");
-      setMessageType("success");
-      const data = response.data;
+  try {
+    const requestBody = { ...customerData, userType: "customer" }; 
+    const response = await register(requestBody);
 
-      // So if you get here, registration succeeded
-      navigate("/login");
-    } catch (err) {
-      // Axios errors store the server response in err.response
-      if (err.response && err.response.data && err.response.data.message) {
-        setError(err.response.data.message);
-      } else {
-        setError("Server error: " + err.message);
-      }
-    }
-  };
+    setMessage(response.data.message);
+    setMessageType("success");
+
+    // Redirect after successful registration
+    setTimeout(() => navigate("/login"), 1500);
+  } catch (error) {
+    const serverMessage = error.response?.data?.message || error.message;
+    setMessage(`Server error: ${serverMessage}`);
+    setMessageType("error");
+  }
+};
 
   const handleChange = (e) => {
     setCustomerData({ ...customerData, [e.target.name]: e.target.value });
@@ -101,6 +101,7 @@ const Register = () => {
           <button type="submit">Register</button>
         </form>
       </div>
+      
       <div className="register-image-container">
         <img src="/phone.jpg" alt="Coinnect Logo" />
       </div>
