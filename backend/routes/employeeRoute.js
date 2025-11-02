@@ -18,7 +18,7 @@ router.get('/getVerifiedTransactions', verifyToken, getVerifiedTransactions);
 // GET a transaction by ID
 router.get('/:id', verifyToken, validateRequest(txSchemas.getOneTransaction), getOneTransaction);
 
-// PUT update employees
+// PUT update status
 router.put(
   '/:id',
   verifyToken,

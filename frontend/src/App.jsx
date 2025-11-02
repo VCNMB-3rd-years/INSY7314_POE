@@ -1,3 +1,6 @@
+import { useEffect } from "react";
+import { initCsrf } from "./interfaces/axiosInstance.js";
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext.jsx";
 
@@ -16,6 +19,10 @@ import CreateTransaction from "./pages/customer/CreateTransaction.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 function App() {
+  useEffect(() => {
+    initCsrf(); // initialize CSRF when app starts
+  }, []);
+
   return (
     <AuthProvider>
       <Router>

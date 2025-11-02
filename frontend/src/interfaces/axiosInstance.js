@@ -1,13 +1,24 @@
-// call in axios to handle our api requests we want to make
-import axios from 'axios';
+// frontend/interfaces/axiosInstance.js
+import axios from "axios";
 
 const axiosInstance = axios.create({
-    // this is the BASE URL, meaning that it must go before any API call we make with axios
-    baseURL: 'https://localhost:3000/v1',
-    // we also tell it that we want to ask the server to respond with JSON, rather than cleartext
-    headers: {
-        'Content-Type': 'application/json'
-    },
+  baseURL: "https://localhost:3000/v1",
+  headers: { "Content-Type": "application/json" },
+  withCredentials: true, // allow cookies (required for CSRF)
 });
+
+// Fetch CSRF token and attach to all requests
+export const initCsrf = async () => {
+  try {
+    const res = await axios.get("https://localhost:3000/csrf-token", {
+      withCredentials: true,
+    });
+    const token = res.data.csrfToken;
+    axiosInstance.defaults.headers.common["X-CSRF-Token"] = token;
+    console.log("CSRF token initialized");
+  } catch (err) {
+    console.error("Failed to initialize CSRF token:", err);
+  }
+};
 
 export default axiosInstance;

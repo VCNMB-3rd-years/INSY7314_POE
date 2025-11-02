@@ -24,7 +24,7 @@ export default function CustTransactions() {
 
     try {
       const res = await axios.get(
-        `http://localhost:3000/v1/transaction/customer/${user.customerId}`,
+        `https://localhost:3000/v1/transaction/customer/${user.customerId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
