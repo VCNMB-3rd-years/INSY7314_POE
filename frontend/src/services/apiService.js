@@ -30,7 +30,7 @@ export const login = (customerData) => axios.post('/auth/login', customerData);
 
 // GET logout credentials
 export const logout = (token) => {
-  return axios.get("/v1/auth/logout", {
+  return axios.get("/auth/logout", {
     headers: { Authorization: `Bearer ${token}` },
   });
 };

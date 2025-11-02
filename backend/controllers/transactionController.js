@@ -34,6 +34,26 @@ const getTransaction = async (req, res) => {
   }
 };
 
+// GET transactions for a specific customer
+const getTransactionsByCustomer = async (req, res) => {
+  try {
+    const { customerId } = req.params;
+
+    // Ensure the logged-in user only accesses their own transactions
+    if (req.user.customerId !== customerId) {
+      return res.status(403).json({ message: "Access denied: cannot view other customer's transactions" });
+    }
+
+    // Fetch transactions for this customer
+    const transactions = await Transaction.find({ customerId });
+
+    res.status(200).json({ transactions });
+  } catch (err) {
+    console.error("Error fetching customer transactions:", err);
+    res.status(500).json({ message: "Failed to fetch transactions" });
+  }
+};
+
 // POST: create a transaction
 const createTransaction = async (req, res) => {
   try {
@@ -54,12 +74,12 @@ const createTransaction = async (req, res) => {
 
     // Create the transaction
     const transaction = await Transaction.create({
-      status,
-      recipientReference,
-      customerReference,
-      amount,
-      customerId,
-      swiftCode
+      customerId: req.user.customerId,
+  amount: req.body.amount,
+  recipientReference: req.body.recipientReference,
+  customerReference: req.body.customerReference,
+  swiftCode: req.body.swiftCode,
+  status: req.body.status || "pending",
     });
 
     res.status(201).json({
@@ -133,4 +153,4 @@ const deleteTransaction = async (req, res) => {
   }
 };
 
-module.exports = { getTransactions, getTransaction, createTransaction, updateStatus, deleteTransaction};
+module.exports = { getTransactions, getTransaction, getTransactionsByCustomer, createTransaction, updateStatus, deleteTransaction};

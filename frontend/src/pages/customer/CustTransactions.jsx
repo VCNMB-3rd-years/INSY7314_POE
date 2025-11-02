@@ -77,11 +77,11 @@ export default function CustTransactions() {
               <tbody>
                 {transactions.map((t) => (
                   <tr key={t.transactionId} style={{ borderBottom: "1px solid #444" }}>
-                    <td style={{ padding: "0.5rem" }}>{t.recipientReference}</td>
-                    <td style={{ padding: "0.5rem" }}>{t.amount}</td>
-                    <td style={{ padding: "0.5rem" }}>{t.customerReference}</td>
+                    <td style={{ padding: "0.5rem" }}>{t.recipientReference || "—"}</td>
+                    <td style={{ padding: "0.5rem" }}>{t.amount || "—"}</td>
+                    <td style={{ padding: "0.5rem" }}>{t.customerReference || "—"}</td>
                     <td style={{ padding: "0.5rem" }}>{t.swiftCode || "—"}</td>
-                    <td style={{ padding: "0.5rem" }}>{t.status == "Pending "}</td>
+                    <td style={{ padding: "0.5rem" }}>{t.status}</td>
                   </tr>
                 ))}
               </tbody>
