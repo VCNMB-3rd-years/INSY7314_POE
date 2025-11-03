@@ -93,7 +93,7 @@ const generalLimiter = rateLimit({
 const loginLimiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 10 min
   max: 5, // 5 attempts per 10 minutes
-  message: "Too many login attempts. Please try again later.",
+  message: "Too many login attempts. Please try again in 10 minutes.",
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -102,7 +102,7 @@ const loginLimiter = rateLimit({
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 10, // 10 registrations per hour
-  message: "Too many registration attempts from this IP. Try again later.",
+  message: "Too many registration attempts from this IP. Try in an hour.",
   standardHeaders: true,
   legacyHeaders: false,
 });
