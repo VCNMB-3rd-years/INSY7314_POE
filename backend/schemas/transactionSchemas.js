@@ -2,22 +2,22 @@
 module.exports = {
   createTransaction: {
     body: {
-      status: { default: 'false', optional: true },
+      status: { default: 'pending', optional: true },
       customerId: 'objectId',
-      amount: 'amount',
-      //currency: 'currency',
-      //provider: 'provider',
-      //payee_account: { pattern: 'accountNumber', optional: false },
-      swiftCode: { pattern: 'swift', optional: false }
+      amount: 'number',
+      recipientReference: { type: 'string', optional: true },
+      customerReference: { type: 'string', optional: true },
+      swiftCode: { pattern: 'swift', optional: true },
     }
   },
 
   updateStatus: {
     params: { id: 'objectId' },
-    body: { status: 'status' }
+    body: { status: 'string' }
   },
 
   getTransaction: {
     params: { id: 'objectId' }
   }
 };
+

@@ -14,6 +14,7 @@ const verifyToken = (req, res, next) => {
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) return res.status(403).json({ message: "Invalid token" });
+    console.log("✅ Decoded token:", decoded); //only fordebugging purposes
     req.user = decoded; // attach user info to request
     next();
   });
@@ -21,12 +22,14 @@ const verifyToken = (req, res, next) => {
 
 const authorizeRole = (allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user || !allowedRoles.includes(req.user.userType)) {
+    const userRole = req.user.role || req.user.userType; // Support both role and user.type
+    if (!userRole || !allowedRoles.includes(userRole)) {
       return res.status(403).json({ message: "Access denied: insufficient role" });
     }
     next();
   };
 };
+
 
 // Invalidate a token (for logout)
 const invalidateToken = (token) => {
