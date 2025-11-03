@@ -2,6 +2,7 @@ const express = require('express');
 const {
   getTransaction,
   getTransactions,
+  getTransactionsByCustomer,
   createTransaction,
   updateStatus,
   deleteTransaction
@@ -19,6 +20,13 @@ router.get('/getTransactions', verifyToken, getTransactions);
 // GET a transaction by ID — only owner (customer) or employee
 router.get('/:id', verifyToken, validateRequest(txSchemas.getTransaction), getTransaction);
 
+//GET method to retreive customer specific transaction
+router.get(
+  '/customer/:customerId',
+  verifyToken,
+  authorizeRole(['customer']),
+  getTransactionsByCustomer
+);
 // POST create transaction — customers only
 router.post(
   '/createTransaction',
