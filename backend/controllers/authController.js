@@ -1,62 +1,49 @@
+// server/controllers/authController.js
 const jwt = require("jsonwebtoken");
 const Customer = require("../models/customerModel.js");
 const Employee = require("../models/employeeModel.js");
 const { invalidateToken } = require("../middlewares/authMiddleware.js");
 require("dotenv").config();
 
-// Helper: generate JWT with username, userType, and customerId
-const generateJwt = (username, userType, customerId) => {
-  if (!process.env.JWT_SECRET) {
-    console.error("JWT_SECRET not found in .env");
-    throw new Error("JWT_SECRET not defined");
-  }
-  return jwt.sign({ username, userType, customerId }, process.env.JWT_SECRET, { expiresIn: "1h" });
+if (!process.env.JWT_SECRET) {
+  console.error("JWT_SECRET not set in .env");
+  process.exit(1);
+}
+
+const generateJwt = (user) => {
+  const payload = {
+    id: String(user._id),
+    username: user.username,
+    role: user.role || user.userType || user.userType, 
+  };
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || "1h" });
 };
 
-
-// POST: Register endpoint
 const register = async (req, res) => {
   const { userType, username, accountNumber, password, lastName, firstName, nationalId } = req.body;
-
-  console.log("Register request body:", req.body);
-
   try {
     if (!userType || !username || !accountNumber || !password || !lastName || !firstName || !nationalId) {
-      return res.status(400).json({
-        message: "Missing required fields. Please ensure all fields are provided: Username, Account Number, Password, Last name, First name, National Id.",
-      });
+      return res.status(400).json({ message: "Missing required fields." });
     }
 
     const UserModel = userType === "customer" ? Customer : Employee;
 
-    // Check if username exists
     const exists = await UserModel.findOne({ username });
     if (exists) {
-      console.warn(`⚠️ Username '${username}' already exists for ${userType}.`);
-      return res.status(400).json({
-        message: `The username '${username}' is already taken. Please choose a different one.`,
-      });
+      return res.status(400).json({ message: `The username '${username}' is already taken.` });
     }
 
-    // Validate password
-    if (!password || password.length < 8) {
-      console.warn("⚠️ Weak password detected.");
-      return res.status(400).json({
-        message: "Password must be at least 8 characters long.",
-      });
+    if (password.length < 8) {
+      return res.status(400).json({ message: "Password must be at least 8 characters long." });
     }
 
-    // Validate account number format
     if (isNaN(accountNumber)) {
-      console.warn("⚠️ Invalid account number format.");
-      return res.status(400).json({
-        message: "Account number must be numeric.",
-      });
+      return res.status(400).json({ message: "Account number must be numeric." });
     }
 
-    // Create user
     const user = await UserModel.create({
       userType,
+      role: userType,
       username,
       password,
       accountNumber,
@@ -65,66 +52,43 @@ const register = async (req, res) => {
       nationalId,
     });
 
-    console.log(`✅ ${userType} registered successfully: ${username}`);
-
-    // Generate JWT
-    const token = generateJwt(username, userType, user._id);
+    const token = generateJwt(user);
 
     res.status(201).json({
       message: `${userType} : '${username}' registered successfully.`,
       token,
     });
   } catch (err) {
-    console.error(" Register error:", err);
-    res.status(500).json({
-      message: "An unexpected error occurred while registering the user.",
-      details: err.message,
-      hint: "Check your MongoDB connection and model validation rules.",
-    });
+    console.error("Register error:", err);
+    res.status(500).json({ message: "Registration failed", details: err.message });
   }
 };
 
-// POST: Login endpoint
 const login = async (req, res) => {
-  const { userType, username, accountNumber, password } = req.body;;
-
-  console.log("Login request body:", req.body);
-
+  const { userType, username, password } = req.body;
   try {
-    const UserModel = userType === "customer" ? Customer : Employee;
+    if (!userType || !username || !password) return res.status(400).json({ message: "Missing credentials." });
 
-    // Find user
+    const UserModel = userType === "customer" ? Customer : Employee;
     const user = await UserModel.findOne({ username });
     if (!user) return res.status(400).json({ message: "Invalid credentials." });
 
-    // Compare password using model method
     const matching = await user.comparePassword(password);
-    console.log("Password matches?", matching);
-
     if (!matching) return res.status(400).json({ message: "Invalid credentials." });
 
-    // Generate JWT
-    const token = jwt.sign(
-      { username, userType, customerId: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
+    if (!user.role) user.role = userType;
 
-    res.status(200).json({ message: `${userType} logged in successfully`, token });
+    const token = generateJwt(user);
+    res.status(200).json({ message: `${user.role} logged in successfully`, token });
   } catch (err) {
     console.error("Login error:", err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: "Login failed", error: err.message });
   }
 };
 
-// POST: Test password against hash (optional endpoint)
 const testPassword = async (req, res) => {
   const { plainPassword, hashedPassword } = req.body;
-
-  if (!plainPassword || !hashedPassword) {
-    return res.status(400).json({ message: "Both plainPassword and hashedPassword are required." });
-  }
-
+  if (!plainPassword || !hashedPassword) return res.status(400).json({ message: "Both fields required." });
   try {
     const match = await require("bcryptjs").compare(plainPassword, hashedPassword);
     res.status(200).json({ match });
@@ -134,16 +98,11 @@ const testPassword = async (req, res) => {
   }
 };
 
-// GET: Logout endpoint
 const logout = (req, res) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
-
   if (!token) return res.status(400).json({ message: "No token provided." });
-
   invalidateToken(token);
-  console.log("Token invalidated:", token);
-
   res.status(200).json({ message: "Logged out successfully." });
 };
 

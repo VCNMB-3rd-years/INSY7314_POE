@@ -1,4 +1,4 @@
-//controllers/transactionController.js
+//controllers/employeeController.js
 const Transaction = require("../models/transactionModel.js");
 
 // GET method to view a list of all the pending transactions of all customers
@@ -68,7 +68,7 @@ const updateStatus = async (req, res) => {
       res.status(404).json({ message: "No transaction found that matches that ID." });
     }
     
-    const updatedStatus = await Employee.findByIdAndUpdate(
+    const updatedStatus = await Transaction.findByIdAndUpdate(
       id,
       { status, recipientReference, customerReference, amount, swiftCode },
       { new: true }

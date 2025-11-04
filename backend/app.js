@@ -9,15 +9,14 @@ const securityMiddlewares = require("./middlewares/securityMiddleware.js");
 const csrf = require("csurf");
 const cookieParser = require("cookie-parser");
 
-// Route imports
 const authRoute = require("./routes/authRoute.js");
 const bankRoute = require("./routes/bankRoute.js");
 const customerRoute = require("./routes/customerRoute.js");
 const transactionRoute = require("./routes/transactionRoute.js");
+const adminRoute = require("./routes/adminRoute.js");
 
 const app = express();
 
-// ---------- Security & Core Setup ----------
 app.use(express.json({ limit: "20kb" }));
 
 app.use(
@@ -78,9 +77,7 @@ app.use((req, res, next) => {
 
 app.use(morgan("dev"));
 
-// ---------- Adaptive Rate Limiting ----------
 
-// General requests (default)
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 min
   max: 200,
@@ -89,7 +86,6 @@ const generalLimiter = rateLimit({
   message: "Too many requests, please try again later.",
 });
 
-// Login endpoint limiter
 const loginLimiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 10 min
   max: 5, // 5 attempts per 10 minutes
@@ -98,7 +94,6 @@ const loginLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Registration endpoint limiter
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 10, // 10 registrations per hour
@@ -107,13 +102,10 @@ const registerLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Apply general limiter globally
 app.use(generalLimiter);
-// Apply specific limiters to critical routes
 app.use("/v1/auth/login", loginLimiter);
 app.use("/v1/auth/register", registerLimiter);
 
-// ---------- CSRF Protection ----------
 app.use(cookieParser());
 const csrfProtection = csrf({
   cookie: {
@@ -123,24 +115,21 @@ const csrfProtection = csrf({
   },
 });
 
-// Apply CSRF to all unsafe methods
 app.use((req, res, next) => {
   if (["GET", "HEAD", "OPTIONS"].includes(req.method)) return next();
   csrfProtection(req, res, next);
 });
 
-// Provide CSRF token endpoint for frontend
 app.get("/csrf-token", csrfProtection, (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 
-// ---------- API Routes ----------
 app.use("/v1/auth", authRoute);
 app.use("/v1/bank", bankRoute);
 app.use("/v1/customer", customerRoute);
 app.use("/v1/transaction", transactionRoute);
+app.use("/v1/admin", adminRoute);
 
-// ---------- Global Error Handler ----------
 app.use((err, req, res, next) => {
   console.error("Unhandled Error:", err);
   res.status(500).json({ error: "Internal server error" });
