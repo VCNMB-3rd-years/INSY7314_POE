@@ -62,6 +62,15 @@ export default function Login() {
           />
           {error && <p style={{ color: "#e74c3c" }}>{error}</p>}
           <button type="submit">Login</button>
+          <p style={{ color: "#e6f0ff", textAlign: "center" }}>
+            Don't have an account?{" "}
+            <a
+              href="/register"
+              style={{ color: "#3b82f6", textDecoration: "none" }}
+            >
+              Register
+            </a>
+          </p>
         </form>
       </div>
       <div className="login-image-container">
