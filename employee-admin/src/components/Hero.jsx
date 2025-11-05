@@ -60,7 +60,7 @@ app.post('/api/payments',
                   className="group bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-4 px-8 rounded-xl flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:-translate-y-1"
                 >
                   <Code size={20} />
-                  Customer Login
+                  Admin Login
                 </button>
 
                 <button
