@@ -7,7 +7,6 @@ import {
   Search,
   Filter,
   Download,
-  Eye,
   CheckCircle,
   XCircle,
   Clock,
@@ -81,7 +80,6 @@ export default function AdminPayments() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [dateFilter, setDateFilter] = useState("all");
 
   const filteredPayments = payments.filter((payment) => {
     const matchesSearch =
@@ -247,14 +245,13 @@ export default function AdminPayments() {
         <div style={tableContainer}>
           <div style={tableHeader}>
             <div style={tableRow}>
-              <div style={{ ...tableCell, flex: 1.5 }}>Payment ID</div>
-              <div style={tableCell}>Customer</div>
+              <div style={{ ...tableCell, flex: 1 }}>Payment ID</div>
+              <div style={{ ...tableCell, flex: 1.2 }}>Customer</div>
               <div style={tableCell}>Amount</div>
               <div style={tableCell}>Method</div>
               <div style={tableCell}>Status</div>
               <div style={tableCell}>Date</div>
               <div style={tableCell}>Processed By</div>
-              <div style={tableCell}>Actions</div>
             </div>
           </div>
 
@@ -263,17 +260,12 @@ export default function AdminPayments() {
               const statusStyle = getStatusColor(payment.status);
               return (
                 <div key={payment.id} style={tableRow}>
-                  <div style={{ ...tableCell, flex: 1.5, fontWeight: "600" }}>
+                  <div style={{ ...tableCell, flex: 1, fontWeight: "600" }}>
                     {payment.id}
                   </div>
-                  <div style={tableCell}>
+                  <div style={{ ...tableCell, flex: 1.2 }}>
                     <p style={{ fontWeight: "500", margin: 0 }}>
                       {payment.customer}
-                    </p>
-                    <p
-                      style={{ color: "#888", fontSize: "0.875rem", margin: 0 }}
-                    >
-                      {payment.customerEmail}
                     </p>
                   </div>
                   <div style={tableCell}>
@@ -297,16 +289,6 @@ export default function AdminPayments() {
                   <div style={tableCell}>{formatDate(payment.date)}</div>
                   <div style={tableCell}>
                     <p style={{ margin: 0 }}>{payment.employeeName}</p>
-                    <p
-                      style={{ color: "#888", fontSize: "0.75rem", margin: 0 }}
-                    >
-                      {payment.processedBy}
-                    </p>
-                  </div>
-                  <div style={tableCell}>
-                    <button style={viewButton}>
-                      <Eye size={16} />
-                    </button>
                   </div>
                 </div>
               );
@@ -478,16 +460,6 @@ const statusBadge = {
   borderRadius: "9999px",
   fontSize: "0.75rem",
   fontWeight: "600",
-};
-
-const viewButton = {
-  background: "transparent",
-  border: "none",
-  color: "#60a5fa",
-  cursor: "pointer",
-  padding: "0.5rem",
-  borderRadius: "0.375rem",
-  transition: "background-color 0.2s",
 };
 
 const emptyState = {

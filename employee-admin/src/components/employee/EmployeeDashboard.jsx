@@ -1,7 +1,7 @@
 // src/components/employee/EmployeeDashboard.jsx
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar";
-import { ShieldCheck, History, DollarSign } from "lucide-react";
+import { ShieldCheck, History } from "lucide-react";
 
 export default function EmployeeDashboard() {
   const navigate = useNavigate();
@@ -43,10 +43,6 @@ export default function EmployeeDashboard() {
           >
             <History size={22} style={{ marginRight: "0.5rem" }} />
             Payment History
-          </button>
-          <button style={dashboardTile}>
-            <DollarSign size={22} style={{ marginRight: "0.5rem" }} />
-            Statistics
           </button>
         </div>
 
