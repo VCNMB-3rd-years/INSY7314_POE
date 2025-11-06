@@ -1,25 +1,51 @@
 // schemas/adminSchema.js
 const Joi = require("joi");
 
+const usernameRegex = /^[a-zA-Z0-9_.-]{3,30}$/;
+
+const passwordRegex =
+  /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+
+// Create Admin Schema
 const createAdmin = Joi.object({
-  username: Joi.string().min(3).max(30).required().messages({
+  username: Joi.string().pattern(usernameRegex).required().messages({
     "string.empty": "Username is required",
-    "string.min": "Username must be at least 3 characters long",
+    "string.pattern.base":
+      "Username must be 3–30 chars, alphanumeric, . _ - allowed",
   }),
-  password: Joi.string().min(6).required().messages({
+
+  password: Joi.string().pattern(passwordRegex).required().messages({
     "string.empty": "Password is required",
-    "string.min": "Password must be at least 6 characters long",
+    "string.pattern.base":
+      "Password must be 8+ chars, include uppercase, lowercase, number, special character",
+  }),
+
+  // Admins cannot set role manually
+  role: Joi.forbidden().messages({
+    "any.unknown": "Role cannot be set manually.",
   }),
 });
 
+// Update Admin Schema
 const updateAdmin = Joi.object({
-  username: Joi.string().min(3).max(30).optional(),
-  password: Joi.string().min(6).optional(),
+  username: Joi.string().pattern(usernameRegex).optional().messages({
+    "string.pattern.base":
+      "Username must be 3–30 chars, alphanumeric, . _ - allowed",
+  }),
+
+  password: Joi.string().pattern(passwordRegex).optional().messages({
+    "string.pattern.base":
+      "Password must be 8+ chars, include uppercase, lowercase, number, special character",
+  }),
+
+  role: Joi.forbidden().messages({
+    "any.unknown": "Role cannot be modified.",
+  }),
 });
 
 const getAdmin = Joi.object({
   id: Joi.string().hex().length(24).required().messages({
-    "string.length": "Admin ID must be a valid 24-character MongoDB ObjectId",
+    "string.length": "Admin ID must be a valid 24-character ObjectId",
   }),
 });
 

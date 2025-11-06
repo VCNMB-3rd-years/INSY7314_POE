@@ -67,6 +67,7 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   if (req.body) req.body = sanitize(req.body);
   if (req.params) req.params = sanitize(req.params);
+  if (req.query) req.query = sanitize(req.query);
   next();
 });
 
@@ -110,7 +111,7 @@ app.use(cookieParser());
 const csrfProtection = csrf({
   cookie: {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
   },
 });
@@ -129,6 +130,13 @@ app.use("/v1/bank", bankRoute);
 app.use("/v1/customer", customerRoute);
 app.use("/v1/transaction", transactionRoute);
 app.use("/v1/admin", adminRoute);
+
+app.use((err, req, res, next) => {
+  if (err.code === "EBADCSRFTOKEN") {
+    return res.status(403).json({ message: "Invalid CSRF token" });
+  }
+  next(err);
+});
 
 app.use((err, req, res, next) => {
   console.error("Unhandled Error:", err);

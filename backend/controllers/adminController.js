@@ -43,6 +43,10 @@ const createEmployee = async (req, res) => {
     if (existing)
       return res.status(409).json({ message: "Username already exists." });
 
+    if (role !== "employee") {
+      return res.status(400).json({ message: "Invalid role. Only 'employee' allowed." });
+    }
+
     const newEmployee = await Employee.create({ username, password, role });
 
     res.status(201).json({
@@ -63,11 +67,10 @@ const updateEmployee = async (req, res) => {
   const id = req.params.id;
 
   try {
-    const updatedEmployee = await Employee.findByIdAndUpdate(
-      id,
-      req.body,
-      { new: true, select: "-password" }
-    );
+    const updatedEmployee = await Employee.findByIdAndUpdate(id, req.body, {
+  new: true
+}).select("-password");
+
 
     if (!updatedEmployee)
       return res.status(404).json({ message: "Employee not found." });
