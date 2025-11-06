@@ -1,5 +1,6 @@
 // controllers/customerController.js
 const Employee = require("../models/employeeModel.js");
+const Admin = require("../models/adminModel.js");
 
 // GET method to view list of all employees and fields, except passwords
 const getEmployees = async (req, res) => {
@@ -7,6 +8,17 @@ const getEmployees = async (req, res) => {
     const employees = await Employee.find({});
     // return the employees
     res.status(200).json(employees);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// GET method to view list of all admins
+const getAdmins = async (req, res) => {
+  try {
+    const admins = await Admin.find({});
+    // return the admins
+    res.status(200).json(admins);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -24,7 +36,7 @@ const getEmployee = async (req, res) => {
 
   try {
     // try find the employees using the provided ID
-    const employees = await Customer.findById(id);
+    const employees = await Employee.findById(id);
 
     // if no employees is found matching the provided ID, we should return 404 with an informative message
     if (!employees) {
@@ -48,33 +60,29 @@ const createEmployee = async (req, res) => {
     }
 
     const { username, password } = req.body;
-    const customerId = req.user.customerId; 
+    const employeeId = req.user.employeeId; 
 
     // Validate required fields
-    if (!recipientReference || !customerReference || !amount || !swiftCode) {
+    if (!username || !password) {
       return res.status(400).json({
-        message: "Missing required fields: recipientReference, customerReference, swift code or amount."
+        message: "Missing required fields: username, password."
       });
     }
 
-    // Create the transaction
-    const transaction = await Transaction.create({
-      status,
-      recipientReference,
-      customerReference,
-      amount,
-      customerId,
-      swiftCode
+    // Create the employee
+    const employee = await Employee.create({
+      username, 
+      password
     });
 
     res.status(201).json({
-      message: "Transaction created successfully.",
-      transaction
+      message: "Employee created successfully.",
+      employee
     });
   } catch (error) {
-    console.error("Create Transaction Error:", error);
+    console.error("Create Employee Error:", error);
     res.status(500).json({
-      message: "An error occurred while creating the transaction.",
+      message: "An error occurred while creating the employee.",
       error: error.message
     });
   }
@@ -137,4 +145,4 @@ const deleteEmployee = async (req, res) => {
   }
 };
 
-module.exports = { getEmployees, getEmployee, createEmployee, updateEmployee, deleteEmployee};
+module.exports = { getEmployees, getEmployee, getAdmins, createEmployee, updateEmployee, deleteEmployee};

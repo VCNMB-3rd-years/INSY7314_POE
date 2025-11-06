@@ -75,11 +75,11 @@ const createTransaction = async (req, res) => {
     // Create the transaction
     const transaction = await Transaction.create({
       customerId: req.user.customerId,
-  amount: req.body.amount,
-  recipientReference: req.body.recipientReference,
-  customerReference: req.body.customerReference,
-  swiftCode: req.body.swiftCode,
-  status: req.body.status || "pending",
+      amount: req.body.amount,
+      recipientReference: req.body.recipientReference,
+      customerReference: req.body.customerReference,
+      swiftCode: req.body.swiftCode,
+      status: req.body.status || "pending",
     });
 
     res.status(201).json({

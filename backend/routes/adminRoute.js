@@ -1,6 +1,6 @@
 const express = require('express');
 const {
-  getEmployees, getEmployee, createEmployee, updateEmployee, deleteEmployee
+  getEmployees, getEmployee, getAdmins, createEmployee, updateEmployee, deleteEmployee
 } = require('../controllers/adminController.js');
 
 const validateRequest = require('../middlewares/validateRequest');
@@ -8,6 +8,9 @@ const txSchemas = require('../schemas/adminSchemas.js');
 const { verifyToken, authorizeRole, } = require('../middlewares/authMiddleware.js');
 
 const router = express.Router();
+
+// GET all admins
+router.get('/getAdmins', verifyToken, getAdmins);
 
 // GET all employees
 router.get('/getEmployees', verifyToken, getEmployees);

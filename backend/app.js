@@ -14,6 +14,8 @@ const authRoute = require("./routes/authRoute.js");
 const bankRoute = require("./routes/bankRoute.js");
 const customerRoute = require("./routes/customerRoute.js");
 const transactionRoute = require("./routes/transactionRoute.js");
+const employeeRoute = require("./routes/employeeRoute.js");
+const adminRoute = require("./routes/adminRoute.js");
 
 const app = express();
 
@@ -112,6 +114,7 @@ app.use(generalLimiter);
 // Apply specific limiters to critical routes
 app.use("/v1/auth/login", loginLimiter);
 app.use("/v1/auth/register", registerLimiter);
+app.use("/v1/auth/staffRegister", registerLimiter);
 
 // ---------- CSRF Protection ----------
 app.use(cookieParser());
@@ -139,6 +142,8 @@ app.use("/v1/auth", authRoute);
 app.use("/v1/bank", bankRoute);
 app.use("/v1/customer", customerRoute);
 app.use("/v1/transaction", transactionRoute);
+app.use("/v1/employee", employeeRoute);
+app.use("/v1/admin", adminRoute);
 
 // ---------- Global Error Handler ----------
 app.use((err, req, res, next) => {
