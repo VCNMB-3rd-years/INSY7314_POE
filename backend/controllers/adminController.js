@@ -1,12 +1,11 @@
-// controllers/customerController.js
+// controllers/adminController.js
 const Employee = require("../models/employeeModel.js");
 const Admin = require("../models/adminModel.js");
 
-// GET method to view list of all employees and fields, except passwords
+// GET ALL EMPLOYEES
 const getEmployees = async (req, res) => {
   try {
-    const employees = await Employee.find({});
-    // return the employees
+    const employees = await Employee.find({}, "-password"); // exclude passwords
     res.status(200).json(employees);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -26,123 +25,96 @@ const getAdmins = async (req, res) => {
 
 // GET: get a singluar employee by id
 const getEmployee = async (req, res) => {
-  // get the id of the employees that the user is looking for, from the parameters
   const id = req.params.id;
 
-  // null check
-  if (!id) {
-    res.status(400).json({ message: "Please provide an ID to search for!" });
-  }
+  if (!id) return res.status(400).json({ message: "Employee ID required." });
 
   try {
-    // try find the employees using the provided ID
-    const employees = await Employee.findById(id);
+    const employee = await Employee.findById(id, "-password");
+    if (!employee)
+      return res.status(404).json({ message: "Employee not found." });
 
-    // if no employees is found matching the provided ID, we should return 404 with an informative message
-    if (!employees) {
-      res.status(404).json({ message: "No employees found that matches that ID." });
-    }
-
-    // otherwise, return the employees
-    res.status(200).json(employees);
+    res.status(200).json(employee);
   } catch (error) {
-    // throw a server error if an issue occurs
     res.status(500).json({ error: error.message });
   }
 };
 
-// POST method to create a new employee
+// CREATE EMPLOYEE
 const createEmployee = async (req, res) => {
   try {
-    // Ensure the user is logged in and has an ID
-    if (!req.user || !req.user.adminId) {
-      return res.status(401).json({ message: "Unauthorized — please log in first." });
-    }
+    const { username, password, role } = req.body;
 
-    const { username, password } = req.body;
-    const employeeId = req.user.employeeId; 
-
-    // Validate required fields
-    if (!username || !password) {
+    if (!username || !password || !role) {
       return res.status(400).json({
-        message: "Missing required fields: username, password."
+        message: "Username, password, and role are required.",
       });
     }
 
-    // Create the employee
-    const employee = await Employee.create({
-      username, 
-      password
-    });
+    const existing = await Employee.findOne({ username });
+    if (existing)
+      return res.status(409).json({ message: "Username already exists." });
+
+    if (role !== "employee") {
+      return res.status(400).json({ message: "Invalid role. Only 'employee' allowed." });
+    }
+
+    const newEmployee = await Employee.create({ username, password, role });
 
     res.status(201).json({
       message: "Employee created successfully.",
-      employee
+      employee: {
+        id: newEmployee._id,
+        username: newEmployee.username,
+        role: newEmployee.role,
+      },
     });
   } catch (error) {
-    console.error("Create Employee Error:", error);
-    res.status(500).json({
-      message: "An error occurred while creating the employee.",
-      error: error.message
-    });
+    res.status(500).json({ error: error.message });
   }
 };
 
-
-// PUT method to update an employee's account details
+// UPDATE EMPLOYEE
 const updateEmployee = async (req, res) => {
-  // first we get the ID from the url
   const id = req.params.id;
-  // then the updated information from the body
-  const { username, password } = req.body;
 
   try {
-    // firstly find the employee we need to update
-    const employee = await Employee.findById(id);
+    const updatedEmployee = await Employee.findByIdAndUpdate(id, req.body, {
+  new: true
+}).select("-password");
 
-    // if no employee, inform the user and don't proceed any further
-    if (!employee) {
-      res.status(404).json({ message: "No employee found that matches that ID." });
-    }
-    
-    const updatedEmployee = await Employee.findByIdAndUpdate(
-      id,
-      { username, password },
-      { new: true }
-    );
-   
-    res.status(202).json(employee);
+
+    if (!updatedEmployee)
+      return res.status(404).json({ message: "Employee not found." });
+
+    res.status(202).json(updatedEmployee);
   } catch (error) {
-    // if things go south, spit out the error message
     res.status(500).json({ error: error.message });
   }
 };
 
-// DELETE method to remove an employee
+// DELETE EMPLOYEE
 const deleteEmployee = async (req, res) => {
-  // get the id of the employee we want to remove
   const id = req.params.id;
 
-  // null check
-  if (!id) {
-    res.status(400).json({ message: "Please provide an ID to delete." });
-  }
-
-  // first try find the employee
   try {
-    var employee = await Employee.findById(id);
+    const deleted = await Employee.findByIdAndDelete(id);
+    if (!deleted)
+      return res.status(404).json({ message: "Employee not found." });
 
-    // if no employee, 404 and exit the method
-    if (!employee) {
-      res.status(404).json({ message: "No employee found that matches that ID." });
-    }
-
-    // find the employee, delete it, and return what it was
-    employee = await Employee.findByIdAndDelete(id);
-    res.status(202).json(employee);
+    res.status(202).json({
+      message: "Employee deleted.",
+      employee: deleted,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-module.exports = { getEmployees, getEmployee, getAdmins, createEmployee, updateEmployee, deleteEmployee};
+module.exports = {
+  getEmployees,
+  getEmployee,
+  createEmployee,
+  updateEmployee,
+  deleteEmployee,
+};

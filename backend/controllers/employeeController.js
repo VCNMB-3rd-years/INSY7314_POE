@@ -1,4 +1,4 @@
-//controllers/transactionController.js
+//controllers/employeeController.js
 const Transaction = require("../models/transactionModel.js");
 const Employee = require("../models/employeeModel.js");
 
@@ -55,30 +55,25 @@ const getOneTransaction = async (req, res) => {
 
 // PUT method to update swift code status (approve or deny) of a particular customer
 const updateStatus = async (req, res) => {
-  // first we get the ID from the url
   const id = req.params.id;
-  // then the updated information from the body
-  const {  status, recipientReference, customerReference, amount, swiftCode } = req.body;
+  const { status, recipientReference, customerReference, amount, swiftCode } = req.body;
 
   try {
-    // firstly find the transaction we need to update
-    const transaction = await Transaction.findById(id);
+    const existing = await Transaction.findById(id);
 
-    // if no transaction, inform the user and don't proceed any further
-    if (!transaction) {
-      res.status(404).json({ message: "No transaction found that matches that ID." });
+    if (!existing) {
+      return res.status(404).json({ message: "No transaction found that matches that ID." });
     }
-    
-    const updatedStatus = await Transaction.findByIdAndUpdate(
+
+    const updated = await Transaction.findByIdAndUpdate(
       id,
       { status, recipientReference, customerReference, amount, swiftCode },
       { new: true }
     );
-   
-    res.status(202).json(updatedStatus);
+
+    return res.status(202).json(updated);
   } catch (error) {
-    // if things go south, spit out the error message
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
