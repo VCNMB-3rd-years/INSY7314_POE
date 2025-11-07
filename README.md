@@ -1,3 +1,4 @@
+
 # 💰 Coinnect
 
 Coinnect is a secure digital finance management web application that allows customers to register, log in, and perform seamless transactions through a unified interface.  
@@ -17,16 +18,30 @@ Coinnect enables users to:
 
 ---
 
+## 👥 Team Members
+
+| Name | Student Number | Role |
+|------|----------------|------|
+| Aliziwe Qeqe | ST10382076 | API & Frontend Integration |
+| Mihle Mncunzwa | ST10134328 | Frontend Development |
+| Kuhle Mlinganiso | ST10259861 | API & Frontend Integration + DevSecOps |
+| Aphiwe Mhotwana | ST10085670 | Frontend + DevSecOps |
+| Hlumelo Ntwanambi | ST10383786 | Security Implementation |
+
+---
+
 ## 🧩 Architecture
 
 Coinnect follows a modular **MERN-style architecture** (MongoDB, Express, React, Node.js):
 
 ```
+
 Frontend (React + Vite)
 ↓  (REST API calls)
 Backend (Node.js + Express)
 ↓
 MongoDB (Data persistence)
+
 ```
 
 Each layer communicates using **JSON over HTTPS**, with **JWT tokens** for authorization and session management.
@@ -36,6 +51,7 @@ Each layer communicates using **JSON over HTTPS**, with **JWT tokens** for autho
 ## 📦 Project Structure
 
 ```
+
 backend/
 ├── app.js
 ├── server.js
@@ -65,7 +81,7 @@ backend/
 │   ├── adminSchema.js
 │   └── transactionSchemas.js
 └── services/
-    └── dbService.js
+└── dbService.js
 
 frontend/
 ├── src/
@@ -77,7 +93,8 @@ frontend/
 │   ├── components/
 │   └── api/
 │       └── apiClient.js
-```
+
+````
 
 ---
 
@@ -100,13 +117,13 @@ router.post('/login', async (req, res) => {
   });
   res.status(200).json({ token, customerId: user._id });
 });
-```
+````
 
 ---
 
 ### 2. Transaction Management
 
-Customers can create transactions linked to their `customerId`.  
+Customers can create transactions linked to their `customerId`.
 Each transaction includes fields for **amount**, **SWIFT code**, and **status**.
 
 ---
@@ -116,18 +133,21 @@ Each transaction includes fields for **amount**, **SWIFT code**, and **status**.
 The system includes three distinct roles, all managed via `authController.js`:
 
 #### Customer Role
+
 * Register and log in.
 * Create new transactions.
 * View personal transaction history.
 * Update own profile information.
 
 #### Employee Role
+
 * Log in via `authController.js`.
 * Manage and verify transaction queues.
 * View pending and verified transactions.
 * Approve or deny transactions.
 
 #### Admin Role
+
 * Full access to employee, bank, and customer management.
 * Create, read, update, and delete employees and banks.
 * Manage all customer accounts and data.
@@ -139,7 +159,8 @@ The system includes three distinct roles, all managed via `authController.js`:
 Validation is handled through the `validateRequest` middleware, combining:
 
 * **Joi Schemas** – For sensitive models (Admin, Employee):
-  * Enforces strong password rules:  
+
+  * Enforces strong password rules:
     `^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$`
   * Prevents privilege escalation with `Joi.forbidden()` for the `role` field.
 * **Custom Schemas** – Lightweight type and pattern validation for other models.
@@ -174,18 +195,6 @@ const TransactionSchema = new mongoose.Schema({
   customerId: [{ type: String, ref: "customerModel" }]
 });
 ```
-
----
-
-## 👥 Roles & Responsibilities
-
-| Team Member | Role | Responsibilities |
-| :--- | :--- | :--- |
-| Aliziwe | API ↔ Frontend Integration | Linked REST API endpoints to frontend components and handled data flow |
-| Kuhle | API ↔ Frontend Integration | Implemented data binding and secure API calls between backend and UI |
-| Hlumelo | Security Implementation | Developed `securityMiddleware.js`, managed CORS, Helmet, and HTTPS setup |
-| Mihle | Frontend Development | Designed and implemented the React-based UI and routing |
-| Aphiwe | Frontend + DevSecOps | Handled UX, deployment pipelines, and enforced security best practices |
 
 ---
 
@@ -233,7 +242,7 @@ SUPERADMIN_PASSWORD=ReplaceWithAStrong!Pass1
 
 ### 3. Local SSL (for HTTPS)
 
-The backend is configured to run **HTTPS-only**.  
+The backend is configured to run **HTTPS-only**.
 Generate the following files using a tool like **mkcert**, and place them in the `backend/` root:
 
 ```
@@ -260,56 +269,42 @@ npm test
 
 ## 🧪 API Endpoints
 
-| Method | Endpoint | Description | Role(s) |
-| :--- | :--- | :--- | :--- |
-| **Auth (/v1/auth)** | | | |
-| POST | /register | Register a new customer or employee | Public |
-| POST | /login | Authenticate and get JWT | Public |
-| POST | /test-password | Test a bcrypt hash | Public |
-| GET | /logout | Log out (invalidate token) | Authenticated |
-| **Admin (/v1/admin)** | | | |
-| GET | /getEmployees | List all employees | Admin |
-| GET | /:id | Get employee by ID | Admin |
-| POST | /createEmployee | Create employee account | Admin |
-| PUT | /:id | Update employee | Admin |
-| DELETE | /:id | Delete employee | Admin |
-| **Bank (/v1/bank)** | | | |
-| GET | /getBanks | List all banks | Authenticated ⚠️ |
-| GET | /:id | Get bank details | Authenticated ⚠️ |
-| POST | /createBank | Create bank entry | Employee |
-| PUT | /:id | Update bank details | Employee |
-| DELETE | /:id | Delete bank | Employee |
-| **Customer (/v1/customer)** | | | |
-| GET | /getCustomers | List all customers | Authenticated ⚠️ |
-| GET | /:id | Get customer details | Authenticated ⚠️ |
-| PUT | /:id | Update customer | Authenticated ⚠️ |
-| DELETE | /:id | Delete customer | Authenticated ⚠️ |
-| **Employee (/v1/employee)** | | | |
-| GET | /getPendingTransactions | View pending transactions | Employee, Admin |
-| GET | /getVerifiedTransactions | View approved/denied transactions | Employee, Admin |
-| GET | /:id | Get transaction by ID | Employee, Admin |
-| PUT | /:id | Approve or deny transaction | Employee |
-| **Transaction (/v1/transaction)** | | | |
-| GET | /getTransactions | Get all transactions | Employee, Admin |
-| GET | /customer/:customerId | Get transactions for customer | Customer, Employee, Admin |
-| GET | /:id | Get single transaction | Customer (own), Employee, Admin |
-| POST | /createTransaction | Create transaction | Customer |
-| PUT | /:id | Update transaction status | Employee |
-| DELETE | /:id | Delete transaction | Employee |
-
----
-
-## 🏁 Testing
-
-The backend includes a comprehensive testing suite powered by:
-
-* **Jest** – Test runner.
-* **Supertest** – HTTP endpoint testing.
-* **MongoDB Memory Server** – In-memory database for isolated tests.
-
-```bash
-npm test
-```
+| Method                            | Endpoint                 | Description                         | Role(s)                         |
+| :-------------------------------- | :----------------------- | :---------------------------------- | :------------------------------ |
+| **Auth (/v1/auth)**               |                          |                                     |                                 |
+| POST                              | /register                | Register a new customer or employee | Public                          |
+| POST                              | /login                   | Authenticate and get JWT            | Public                          |
+| POST                              | /test-password           | Test a bcrypt hash                  | Public                          |
+| GET                               | /logout                  | Log out (invalidate token)          | Authenticated                   |
+| **Admin (/v1/admin)**             |                          |                                     |                                 |
+| GET                               | /getEmployees            | List all employees                  | Admin                           |
+| GET                               | /:id                     | Get employee by ID                  | Admin                           |
+| POST                              | /createEmployee          | Create employee account             | Admin                           |
+| PUT                               | /:id                     | Update employee                     | Admin                           |
+| DELETE                            | /:id                     | Delete employee                     | Admin                           |
+| **Bank (/v1/bank)**               |                          |                                     |                                 |
+| GET                               | /getBanks                | List all banks                      | Authenticated ⚠️                |
+| GET                               | /:id                     | Get bank details                    | Authenticated ⚠️                |
+| POST                              | /createBank              | Create bank entry                   | Employee                        |
+| PUT                               | /:id                     | Update bank details                 | Employee                        |
+| DELETE                            | /:id                     | Delete bank                         | Employee                        |
+| **Customer (/v1/customer)**       |                          |                                     |                                 |
+| GET                               | /getCustomers            | List all customers                  | Authenticated ⚠️                |
+| GET                               | /:id                     | Get customer details                | Authenticated ⚠️                |
+| PUT                               | /:id                     | Update customer                     | Authenticated ⚠️                |
+| DELETE                            | /:id                     | Delete customer                     | Authenticated ⚠️                |
+| **Employee (/v1/employee)**       |                          |                                     |                                 |
+| GET                               | /getPendingTransactions  | View pending transactions           | Employee, Admin                 |
+| GET                               | /getVerifiedTransactions | View approved/denied transactions   | Employee, Admin                 |
+| GET                               | /:id                     | Get transaction by ID               | Employee, Admin                 |
+| PUT                               | /:id                     | Approve or deny transaction         | Employee                        |
+| **Transaction (/v1/transaction)** |                          |                                     |                                 |
+| GET                               | /getTransactions         | Get all transactions                | Employee, Admin                 |
+| GET                               | /customer/:customerId    | Get transactions for customer       | Customer, Employee, Admin       |
+| GET                               | /:id                     | Get single transaction              | Customer (own), Employee, Admin |
+| POST                              | /createTransaction       | Create transaction                  | Customer                        |
+| PUT                               | /:id                     | Update transaction status           | Employee                        |
+| DELETE                            | /:id                     | Delete transaction                  | Employee                        |
 
 ---
 
@@ -334,38 +329,38 @@ Coinnect employs a **multi-layered security model**, including:
 ## 💡 Developer Notes & Observations
 
 * **⚠️ Critical:** `/v1/customer` and `/v1/bank` GET routes lack `authorizeRole` protection.
+
   * Add `authorizeRole(['admin', 'employee'])` to restrict access.
 * **Bank role logic:** Employees can manage banks but Admins cannot. Confirm if intended.
-* **Strong controller-level validation:**  
+* **Strong controller-level validation:**
   `/v1/transaction/:id` correctly validates access — replicate this for `/v1/customer/:id`.
 
 ---
 
-## 📚 Reference List
+## 📚 Reference List (Harvard Anglia)
 
-* Ali, H., 2024. *How to Defend Against Server-Side Request Forgery.* freeCodeCamp.org.  
-  https://www.freecodecamp.org/news/defending-against-ssrf-attacks/
-* Charity, D.T., 2024. *How to Hash Passwords with bcrypt in Node.js.* freeCodeCamp.org.  
-  https://www.freecodecamp.org/news/how-to-hash-passwords-with-bcrypt-in-nodejs/
-* Çoban, A.T., 2024. *RBAC (Role-Based Access Control) in Node.js.* Medium.  
-  https://alitalhacoban.medium.com/rbac-role-based-access-control-in-node-js-d8e5a2d5e67c
-* Cybersecurity, T., 2024. *What is Cache-Control and How HTTP Cache Headers Work.* Imperva.  
-  https://www.imperva.com/learn/performance/cache-control/
-* Das, A., 2025. *Top 6 Methods for Managing Sessions in Node.js.* Medium.  
-  https://article.arunangshudas.com/top-6-methods-for-managing-sessions-in-node-js-d44615a35ec6
-* Helmet.js, 2025a. *GitHub - helmetjs/helmet.*  
-  https://github.com/helmetjs/helmet
-* Helmet.js, 2025b. *Helmet Documentation.*  
-  https://helmetjs.github.io/
-* mdn, 2025. *Client-side Form Validation.* Mozilla Developer Network.  
-  https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Form_validation
-* MeRahulAhire, 2020. *httpOnly-cookie-React-Node.* GitHub.  
-  https://github.com/MeRahulAhire/httpOnly-cookie-React-Node/blob/master/server.js
-* npm, 2025. *Helmet Package.* npm.  
-  https://www.npmjs.com/package/helmet
-* TechRide with PK, 2025. *Implement Security using TLS/SSL Connection.* YouTube.  
-  https://www.youtube.com/watch?v=zvWwCrNVZlI
-* Zanini, A., 2023. *Using Helmet in Node.js to Secure Your Application.* LogRocket Blog.  
-  https://blog.logrocket.com/using-helmet-node-js-secure-application/
-* Zanini, A., 2024. *How to Implement Rate Limiting in Express for Node.js.* AppSignal.  
-  https://www.appsignal.com/
+Ali, H. (2024) *How to Defend Against Server-Side Request Forgery.* FreeCodeCamp.org. Available at: [https://www.freecodecamp.org/news/defending-against-ssrf-attacks/](https://www.freecodecamp.org/news/defending-against-ssrf-attacks/) (Accessed: 7 November 2025).
+
+Charity, D.T. (2024) *How to Hash Passwords with bcrypt in Node.js.* FreeCodeCamp.org. Available at: [https://www.freecodecamp.org/news/how-to-hash-passwords-with-bcrypt-in-nodejs/](https://www.freecodecamp.org/news/how-to-hash-passwords-with-bcrypt-in-nodejs/) (Accessed: 7 November 2025).
+
+Çoban, A.T. (2024) *RBAC (Role-Based Access Control) in Node.js.* Medium. Available at: [https://alitalhacoban.medium.com/rbac-role-based-access-control-in-node-js-d8e5a2d5e67c](https://alitalhacoban.medium.com/rbac-role-based-access-control-in-node-js-d8e5a2d5e67c) (Accessed: 7 November 2025).
+
+Cybersecurity, T. (2024) *What is Cache-Control and How HTTP Cache Headers Work.* Imperva. Available at: [https://www.imperva.com/learn/performance/cache-control/](https://www.imperva.com/learn/performance/cache-control/) (Accessed: 7 November 2025).
+
+Das, A. (2025) *Top 6 Methods for Managing Sessions in Node.js.* Medium. Available at: [https://article.arunangshudas.com/top-6-methods-for-managing-sessions-in-node-js-d44615a35ec6](https://article.arunangshudas.com/top-6-methods-for-managing-sessions-in-node-js-d44615a35ec6) (Accessed: 7 November 2025).
+
+Helmet.js (2025a) *GitHub - helmetjs/helmet.* Available at: [https://github.com/helmetjs/helmet](https://github.com/helmetjs/helmet) (Accessed: 7 November 2025).
+
+Helmet.js (2025b) *Helmet Documentation.* Available at: [https://helmetjs.github.io/](https://helmetjs.github.io/) (Accessed: 7 November 2025).
+
+Mozilla Developer Network (2025) *Client-side Form Validation.* Available at: [https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Form_validation](https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Form_validation) (Accessed: 7 November 2025).
+
+MeRahulAhire (2020) *httpOnly-cookie-React-Node.* GitHub. Available at: [https://github.com/MeRahulAhire/httpOnly-cookie-React-Node/blob/master/server.js](https://github.com/MeRahulAhire/httpOnly-cookie-React-Node/blob/master/server.js) (Accessed: 7 November 2025).
+
+npm (2025) *Helmet Package.* npm. Available at: [https://www.npmjs.com/package/helmet](https://www.npmjs.com/package/helmet) (Accessed: 7 November 2025).
+
+TechRide with PK (2025) *Implement Security using TLS/SSL Connection.* YouTube. Available at: [https://www.youtube.com/watch?v=zvWwCrNVZlI](https://www.youtube.com/watch?v=zvWwCrNVZlI) (Accessed: 7 November 2025).
+
+Zanini, A. (2023) *Using Helmet in Node.js to Secure Your Application.* LogRocket Blog. Available at: [https://blog.logrocket.com/using-helmet-node-js-secure-application/](https://blog.logrocket.com/using-helmet-node-js-secure-application/) (Accessed: 7 November 2025).
+
+Zanini, A. (2024) *How to Implement Rate Limiting in Express for Node.js.* AppSignal. Available at: [https://www.appsignal.com/](https://www.appsignal.com/) (Accessed: 7 November 2025).
