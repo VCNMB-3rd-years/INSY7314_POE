@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  zap: owasp/zap@2.0.0
+  zap: owasp/zap@0.0.5
   
 jobs:
   # --- Simple sanity check ---
