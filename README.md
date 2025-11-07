@@ -1,7 +1,7 @@
 
 # 💰 Coinnect
 
-Coinnect is a secure digital finance management web application that allows customers to register, log in, and perform seamless transactions through a unified interface.  
+Coinnect is a secure digital finance management dockerized web application that allows customers to register, log in, and perform seamless transactions through a unified interface.  
 It connects a **React-based frontend** with a **Node.js + Express backend** and a **MongoDB database**, ensuring smooth data flow, strict security measures, and modern web standards.
 
 ---
@@ -246,8 +246,8 @@ The backend is configured to run **HTTPS-only**.
 Generate the following files using a tool like **mkcert**, and place them in the `backend/` root:
 
 ```
-localhost+1-key.pem
-localhost+1.pem
+localhost+2-key.pem
+localhost+2.pem
 ```
 
 ---
@@ -334,6 +334,14 @@ Coinnect employs a **multi-layered security model**, including:
 * **Bank role logic:** Employees can manage banks but Admins cannot. Confirm if intended.
 * **Strong controller-level validation:**
   `/v1/transaction/:id` correctly validates access — replicate this for `/v1/customer/:id`.
+
+---
+
+##  Changelog from Part 2 into Part 3
+
+1. SSL certificates were integrated into all the backend, frontend and employee-admin frontend.
+2. CSRF was incorporated into the program in the backend and frontend.
+3. Brute force prevention attacks were protected against in Part 3
 
 ---
 
