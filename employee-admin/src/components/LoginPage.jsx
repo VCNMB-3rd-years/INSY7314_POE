@@ -79,7 +79,7 @@ const LoginPage = () => {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="admin.username"
+              placeholder="Enter username"
               className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
               required
             />
@@ -99,27 +99,25 @@ const LoginPage = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder="Enter password"
               className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
               required
             />
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="admin-remember"
-              className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-            />
-            <label
-              htmlFor="admin-remember"
-              className="ml-2 text-sm text-gray-600"
-            >
-              Remember me
-            </label>
-          </div>
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            id="admin-remember"
+            className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+          />
+          <label
+            htmlFor="admin-remember"
+            className="ml-2 text-sm text-gray-600"
+          >
+            Remember me
+          </label>
         </div>
 
         <button
@@ -129,12 +127,6 @@ const LoginPage = () => {
           Admin Login
         </button>
       </form>
-
-      <div className="text-center mt-6">
-        <button className="text-purple-600 hover:text-purple-800 font-medium transition-colors text-sm">
-          Forgot admin credentials?
-        </button>
-      </div>
     </div>
   );
 
@@ -176,7 +168,7 @@ const LoginPage = () => {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="employee.id@coinnect.com"
+              placeholder="Enter username"
               className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               required
             />
@@ -196,30 +188,25 @@ const LoginPage = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder="Enter password"
               className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               required
             />
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="employee-remember"
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label
-              htmlFor="employee-remember"
-              className="ml-2 text-sm text-gray-600"
-            >
-              Remember me
-            </label>
-          </div>
-          <button className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors">
-            Forgot password?
-          </button>
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            id="employee-remember"
+            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          />
+          <label
+            htmlFor="employee-remember"
+            className="ml-2 text-sm text-gray-600"
+          >
+            Remember me
+          </label>
         </div>
 
         <button
@@ -229,12 +216,6 @@ const LoginPage = () => {
           Employee Login
         </button>
       </form>
-
-      <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-        <p className="text-blue-800 text-sm text-center">
-          Need help? Contact your department manager or IT support.
-        </p>
-      </div>
     </div>
   );
 

@@ -1,7 +1,7 @@
 // src/components/admin/AdminDashboard.jsx
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar";
-import { Users, UserPlus, FolderOpen, BarChart3 } from "lucide-react";
+import { Users, UserPlus } from "lucide-react";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ export default function AdminDashboard() {
             Welcome back!
           </h1>
           <p style={{ color: "#bbb", fontSize: "1rem" }}>
-            Manage employee accounts and monitor system activities.
+            Manage employee accounts and system access.
           </p>
         </div>
 
@@ -43,17 +43,6 @@ export default function AdminDashboard() {
           >
             <UserPlus size={22} style={{ marginRight: "0.5rem" }} />
             Create Employee
-          </button>
-          <button
-            style={dashboardTile}
-            onClick={() => navigate("/admin/payments")}
-          >
-            <FolderOpen size={22} style={{ marginRight: "0.5rem" }} />
-            All Payments
-          </button>
-          <button style={dashboardTile}>
-            <BarChart3 size={22} style={{ marginRight: "0.5rem" }} />
-            System Analytics
           </button>
         </div>
 

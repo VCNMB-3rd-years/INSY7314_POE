@@ -9,7 +9,7 @@ const PORT = process.env.API_PORT || 3000;
 
 const options = {
   key: fs.readFileSync("./localhost+2-key.pem"),
-  cert: fs.readFileSync("./localhost+2.pem"), 
+  cert: fs.readFileSync("./localhost+2.pem"),
 };
 
 connectToMongo()
