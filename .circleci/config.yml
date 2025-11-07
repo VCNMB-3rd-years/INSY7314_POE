@@ -1,8 +1,7 @@
 version: 2.1
 
-orbs:
-  # This is the correct orb name, version, and indentation
-  zap: zaproxy/zap-api-scan@0.0.5
+# NO ORBS NEEDED FOR ZAP
+# We will call the Docker image directly.
 
 jobs:
   # --- Simple sanity check ---
@@ -141,22 +140,37 @@ jobs:
               -Dsonar.branch.name="$SONAR_BRANCH" \
               -Dsonar.sources="."
 
-  # --- ZAP API SCAN JOB ---
-  # This is now at the correct indentation level
+  # --- ZAP API SCAN JOB (The correct, manual way) ---
   zap-api-scan:
+    # 1. Use the official ZAP Docker image
     docker:
-      - image: cimg/base:current # Orb handles the ZAP image
+      - image: owasp/zap2docker-stable
     steps:
-      - zap/api-scan:
-          # --- !! CRITICAL: YOU MUST CHANGE THIS !! ---
-          # ZAP needs a *running* application to scan.
-          # Update this to your staging or dev API's URL.
-          target-url: 'https://your-staging-api.example.com'
-          
-          # You can add other parameters here:
-          # report-file-name: 'zap-report.html'
-          # rules-to-ignore: '10020,10021' # e.g., Ignore specific rules
-          # fail-on-medium-risk: true
+      - run:
+          name: Create reports directory
+          command: mkdir -p /zap/wrk/reports
+      - run:
+          name: Run ZAP API Scan
+          command: |
+            # 2. Execute the python script inside the container
+            #    This is the command the user was trying to use
+            zap-api-scan.py \
+              -t https://your-staging-api.example.com \
+              -f openapi \
+              -r /zap/wrk/reports/api-scan-report.html
+            
+            # --- !! CRITICAL !! ---
+            # You MUST change the URL above to your staging/dev server
+            # ZAP cannot scan 'localhost' from this job.
+            
+            # The '-f openapi' flag assumes you have an OpenAPI spec
+            # at that target URL. If not, you may need to change this.
+            # Use '-f soap' for SOAP, or just remove if it's a plain API.
+      
+      # 3. Save the results
+      - store_artifacts:
+          path: /zap/wrk/reports
+          destination: zap-reports
 
 workflows:
   version: 2
