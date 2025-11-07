@@ -1,44 +1,43 @@
+// server/routes/adminRoute.js
 const express = require('express');
 const {
-  getEmployees, getEmployee, createEmployee, updateEmployee, deleteEmployee
+  getEmployees,
+  getEmployee,
+  createEmployee,
+  updateEmployee,
+  deleteEmployee
 } = require('../controllers/adminController.js');
 
 const validateRequest = require('../middlewares/validateRequest');
-const txSchemas = require('../schemas/adminSchemas.js');
-const { verifyToken, authorizeRole, } = require('../middlewares/authMiddleware.js');
+const employeeSchemas = require('../schemas/employeeSchema.js'); 
+const { verifyToken, authorizeRole } = require('../middlewares/authMiddleware.js');
 
 const router = express.Router();
 
-// GET all employees
-router.get('/getEmployees', verifyToken, getEmployees);
+router.get('/getEmployees', verifyToken, authorizeRole(['admin']), getEmployees);
+router.get('/:id', verifyToken, authorizeRole(['admin']), validateRequest(employeeSchemas.getEmployee), getEmployee);
 
-// GET a employee by ID
-router.get('/:id', verifyToken, validateRequest(txSchemas.getEmployee), getEmployee);
-
-// POST create transaction — customers only
 router.post(
   '/createEmployee',
   verifyToken,
   authorizeRole(['admin']),
-  validateRequest(txSchemas.createEmployee),
+  validateRequest(employeeSchemas.createEmployee),
   createEmployee
 );
 
-// PUT update employees
 router.put(
   '/:id',
   verifyToken,
   authorizeRole(['admin']),
-  validateRequest(txSchemas.updateEmployee),
+  validateRequest(employeeSchemas.updateEmployee),
   updateEmployee
 );
 
-// DELETE transaction — employees only
 router.delete(
   '/:id',
   verifyToken,
   authorizeRole(['admin']),
-  validateRequest(txSchemas.getEmployee),
+  validateRequest(employeeSchemas.getEmployee),
   deleteEmployee
 );
 
