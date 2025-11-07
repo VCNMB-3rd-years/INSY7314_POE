@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  zap: owasp/zap@2.0.0
+  
 jobs:
   # --- Simple sanity check ---
   say-hello:
@@ -136,6 +139,22 @@ jobs:
               -Dsonar.login="$SONAR_TOKEN" \
               -Dsonar.branch.name="$SONAR_BRANCH" \
               -Dsonar.sources="."
+
+    # --- 2. ADD THE NEW ZAP SCAN JOB ---
+      zap-api-scan:
+        docker:
+          - image: cimg/base:current # Orb handles the ZAP image
+        steps:
+          - zap/api-scan:
+              # --- !! CRITICAL: YOU MUST CHANGE THIS !! ---
+              # ZAP needs a *running* application to scan.
+              # Update this to your staging or dev API's URL.
+              target-url: 'https://your-staging-api.example.com'
+              
+              # You can add other parameters here:
+              # report-file-name: 'zap-report.html'
+              # rules-to-ignore: '10020,10021' # e.g., Ignore specific rules
+              # fail-on-medium-risk: true
 
 workflows:
   version: 2
