@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar";
-import { Users, UserPlus, Trash2, Edit, Search } from "lucide-react";
+import { Users, UserPlus, Trash2, Search } from "lucide-react";
 
 // Demo employee data
 const employees = [
@@ -13,7 +13,6 @@ const employees = [
     fullName: "John Smith",
     department: "Payment Processing",
     employeeId: "EMP001",
-    status: "active",
     createdAt: "2024-03-10T10:00:00Z",
   },
   {
@@ -23,7 +22,6 @@ const employees = [
     fullName: "Sarah Johnson",
     department: "Payment Verification",
     employeeId: "EMP002",
-    status: "active",
     createdAt: "2024-03-12T11:15:00Z",
   },
   {
@@ -33,7 +31,6 @@ const employees = [
     fullName: "Mike Wilson",
     department: "Customer Support",
     employeeId: "EMP003",
-    status: "inactive",
     createdAt: "2024-03-15T14:30:00Z",
   },
 ];
@@ -53,16 +50,6 @@ export default function AdminEmployeeManagement() {
   const deleteEmployee = (employeeId) => {
     setEmployeeList(employeeList.filter((emp) => emp.id !== employeeId));
     console.log("Deleted employee:", employeeId);
-  };
-
-  const toggleEmployeeStatus = (employeeId) => {
-    setEmployeeList(
-      employeeList.map((emp) =>
-        emp.id === employeeId
-          ? { ...emp, status: emp.status === "active" ? "inactive" : "active" }
-          : emp
-      )
-    );
   };
 
   return (
@@ -120,7 +107,6 @@ export default function AdminEmployeeManagement() {
               <div style={{ ...tableCell, flex: 2 }}>Employee</div>
               <div style={tableCell}>Department</div>
               <div style={tableCell}>Employee ID</div>
-              <div style={tableCell}>Status</div>
               <div style={tableCell}>Actions</div>
             </div>
           </div>
@@ -138,28 +124,7 @@ export default function AdminEmployeeManagement() {
                 </div>
                 <div style={tableCell}>{employee.department}</div>
                 <div style={tableCell}>{employee.employeeId}</div>
-                <div style={tableCell}>
-                  <button
-                    onClick={() => toggleEmployeeStatus(employee.id)}
-                    style={{
-                      ...statusBadge,
-                      ...(employee.status === "active"
-                        ? activeBadge
-                        : inactiveBadge),
-                    }}
-                  >
-                    {employee.status.toUpperCase()}
-                  </button>
-                </div>
                 <div style={{ ...tableCell, gap: "0.5rem", display: "flex" }}>
-                  <button
-                    style={editButton}
-                    onClick={() =>
-                      navigate(`/admin/edit-employee/${employee.id}`)
-                    }
-                  >
-                    <Edit size={16} />
-                  </button>
                   <button
                     onClick={() => deleteEmployee(employee.id)}
                     style={deleteButton}
@@ -270,36 +235,6 @@ const tableCell = {
 
 const tableBody = {
   background: "#2a2a2a",
-};
-
-const statusBadge = {
-  padding: "0.25rem 0.75rem",
-  borderRadius: "9999px",
-  fontSize: "0.75rem",
-  fontWeight: "600",
-  border: "none",
-  cursor: "pointer",
-  transition: "all 0.2s",
-};
-
-const activeBadge = {
-  background: "#065f46",
-  color: "#34d399",
-};
-
-const inactiveBadge = {
-  background: "#7f1d1d",
-  color: "#f87171",
-};
-
-const editButton = {
-  background: "transparent",
-  border: "none",
-  color: "#60a5fa",
-  cursor: "pointer",
-  padding: "0.5rem",
-  borderRadius: "0.375rem",
-  transition: "background-color 0.2s",
 };
 
 const deleteButton = {
