@@ -246,8 +246,8 @@ The backend is configured to run **HTTPS-only**.
 Generate the following files using a tool like **mkcert**, and place them in the `backend/` root:
 
 ```
-localhost+2-key.pem
-localhost+2.pem
+localhost+1-key.pem
+localhost+1.pem
 ```
 
 ---
