@@ -20,32 +20,35 @@ const Register = () => {
   const [error, setError] = useState("");
 
   const handleRegister = async (e) => {
-  e.preventDefault();
-  setError("");
-  setMessage("");
+    e.preventDefault();
+    setError("");
+    setMessage("");
 
-  try {
-    const requestBody = { ...customerData, userType: "customer" }; 
-    const response = await register(requestBody);
+    try {
+      const requestBody = { ...customerData, userType: "customer" };
+      const response = await register(requestBody);
 
-    setMessage(response.data.message);
-    setMessageType("success");
+      setMessage(response.data.message);
+      setMessageType("success");
 
-    // Redirect after successful registration
-    setTimeout(() => navigate("/login"), 1500);
-  } catch (error) {
-    const serverMessage = error.response?.data?.message || error.message;
-    setMessage(`Server error: ${serverMessage}`);
-    setMessageType("error");
-  }
-};
+      // Redirect after successful registration
+      setTimeout(() => navigate("/login"), 1500);
+    } catch (error) {
+      const serverMessage = error.response?.data?.message || error.message;
+      setMessage(`Server error: ${serverMessage}`);
+      setMessageType("error");
+    }
+  };
 
   const handleChange = (e) => {
     setCustomerData({ ...customerData, [e.target.name]: e.target.value });
   };
 
   return (
-    <div className="register-flex-wrapper" style={{ minHeight: "100vh", overflow: "hidden" }}>
+    <div
+      className="register-flex-wrapper"
+      style={{ minHeight: "100vh", overflow: "hidden" }}
+    >
       <div className="register-form-container">
         <h1>Register</h1>
         <form className="register-form" onSubmit={handleRegister}>
@@ -99,9 +102,18 @@ const Register = () => {
           />
           {error && <p style={{ color: "red" }}>{error}</p>}
           <button type="submit">Register</button>
+          <p style={{ color: "#e6f0ff", textAlign: "center" }}>
+            Already have an account?{" "}
+            <a
+              href="/login"
+              style={{ color: "#3b82f6", textDecoration: "none" }}
+            >
+              Login
+            </a>
+          </p>
         </form>
       </div>
-      
+
       <div className="register-image-container">
         <img src="/phone.jpg" alt="Coinnect Logo" />
       </div>

@@ -8,3 +8,8 @@ localhost+1.pem
 localhost+1-key.pem
 localhost+2.pem
 localhost+2-key.pem
+
+node_modules/
+**/node_modules/
+*.lock
+package-lock.json
