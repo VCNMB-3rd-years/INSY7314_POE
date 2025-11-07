@@ -114,8 +114,7 @@ jobs:
             else
               echo "No start script found, skipping..."
             fi
-
-  # --- SonarQube analysis ---
+# --- SonarQube analysis ---
   sonarqube:
     docker:
       - image: sonarsource/sonar-scanner-cli
@@ -140,45 +139,37 @@ jobs:
               -Dsonar.branch.name="$SONAR_BRANCH" \
               -Dsonar.sources="."
 
-    # --- 2. ADD THE NEW ZAP SCAN JOB ---
-      zap-api-scan:
-        docker:
-          - image: cimg/base:current # Orb handles the ZAP image
-        steps:
-          - zap/api-scan:
-              # --- !! CRITICAL: YOU MUST CHANGE THIS !! ---
-              # ZAP needs a *running* application to scan.
-              # Update this to your staging or dev API's URL.
-              target-url: 'https://your-staging-api.example.com'
-              
-              # You can add other parameters here:
-              # report-file-name: 'zap-report.html'
-              # rules-to-ignore: '10020,10021' # e.g., Ignore specific rules
-              # fail-on-medium-risk: true
+  # --- 2. ADD THE NEW ZAP SCAN JOB ---
+  # *** NOTICE THIS IS NO LONGER INDENTED UNDER SONARQUBE ***
+  zap-api-scan:
+    docker:
+      - image: cimg/base:current # Orb handles the ZAP image
+    steps:
+      - zap/api-scan:
+          # --- !! CRITICAL: YOU MUST CHANGE THIS !! ---
+          # ZAP needs a *running* application to scan.
+          # Update this to your staging or dev API's URL.
+          target-url: 'https://your-staging-api.example.com'
+          
+          # You can add other parameters here:
+          # report-file-name: 'zap-report.html'
+          # rules-to-ignore: '10020,10021' # e.g., Ignore specific rules
+          # fail-on-medium-risk: true
 
 workflows:
   version: 2
   main-workflow:
     jobs:
-      - say-hello
-      - install-frontend-deps
-      - install-backend-deps
-      - build-frontend:
-          requires:
-            - install-frontend-deps
+      # ... (all your other jobs) ...
       - build-backend:
           requires:
             - install-backend-deps
             
-      # --- 3. ADD ZAP TO YOUR WORKFLOW ---
-      # This runs after the backend is built.
-      # In a real pipeline, you'd add a 'deploy-to-staging' job
-      # and make this 'require' that deploy job.
+      # This part you got perfectly right!
       - zap-api-scan:
           requires:
             - build-backend
 
-      # --- I also fixed SonarQube to run *after* your builds ---
       - sonarqube:
           requires:
             - build-frontend
