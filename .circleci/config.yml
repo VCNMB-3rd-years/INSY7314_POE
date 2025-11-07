@@ -169,4 +169,17 @@ workflows:
       - build-backend:
           requires:
             - install-backend-deps
-      - sonarqube
+            
+      # --- 3. ADD ZAP TO YOUR WORKFLOW ---
+      # This runs after the backend is built.
+      # In a real pipeline, you'd add a 'deploy-to-staging' job
+      # and make this 'require' that deploy job.
+      - zap-api-scan:
+          requires:
+            - build-backend
+
+      # --- I also fixed SonarQube to run *after* your builds ---
+      - sonarqube:
+          requires:
+            - build-frontend
+            - build-backend
