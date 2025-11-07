@@ -1,8 +1,9 @@
 version: 2.1
 
 orbs:
+  # This is the correct orb name, version, and indentation
   zap: zaproxy/zap-api-scan@0.0.5
-  
+
 jobs:
   # --- Simple sanity check ---
   say-hello:
@@ -114,7 +115,8 @@ jobs:
             else
               echo "No start script found, skipping..."
             fi
-# --- SonarQube analysis ---
+            
+  # --- SonarQube analysis ---
   sonarqube:
     docker:
       - image: sonarsource/sonar-scanner-cli
@@ -139,8 +141,8 @@ jobs:
               -Dsonar.branch.name="$SONAR_BRANCH" \
               -Dsonar.sources="."
 
-  # --- 2. ADD THE NEW ZAP SCAN JOB ---
-  # *** NOTICE THIS IS NO LONGER INDENTED UNDER SONARQUBE ***
+  # --- ZAP API SCAN JOB ---
+  # This is now at the correct indentation level
   zap-api-scan:
     docker:
       - image: cimg/base:current # Orb handles the ZAP image
@@ -160,16 +162,22 @@ workflows:
   version: 2
   main-workflow:
     jobs:
-      # ... (all your other jobs) ...
+      - say-hello
+      - install-frontend-deps
+      - install-backend-deps
+      - build-frontend:
+          requires:
+            - install-frontend-deps
       - build-backend:
           requires:
             - install-backend-deps
             
-      # This part you got perfectly right!
+      # This runs the ZAP scan after the backend build finishes
       - zap-api-scan:
           requires:
             - build-backend
 
+      # This runs SonarQube after both builds finish
       - sonarqube:
           requires:
             - build-frontend
